@@ -57,7 +57,10 @@ export class RoomManager {
     if (!room.isEmpty() || this.timers.has(room.code)) return;
     const t = setTimeout(() => {
       this.timers.delete(room.code);
-      if (room.isEmpty()) this.rooms.delete(room.code);
+      if (room.isEmpty()) {
+        room.match?.stop();
+        this.rooms.delete(room.code);
+      }
     }, this.emptyTimeoutMs);
     t.unref();
     this.timers.set(room.code, t);
@@ -66,6 +69,7 @@ export class RoomManager {
   close(): void {
     for (const t of this.timers.values()) clearTimeout(t);
     this.timers.clear();
+    for (const room of this.rooms.values()) room.match?.stop();
     this.rooms.clear();
   }
 }

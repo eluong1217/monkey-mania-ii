@@ -112,7 +112,9 @@ export class Connection implements Member {
             result = room.rematch(this.slot);
             break;
           case 'input':
-            return; // T05 routes inputs to the running match.
+            // Latest input wins; the match ignores it outside PLAYING. The slot is ours, never the message's.
+            room.match?.input(this.slot, m.input);
+            return;
         }
         if (!result.ok) this.error(result.code, result.message);
       }

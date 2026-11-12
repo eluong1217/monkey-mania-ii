@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import {
   MAX_PLAYERS,
   type ErrorCode,
+  type PlayerInput,
   type RoomPhase,
   type SeatInfo,
   type ServerMessage,
@@ -22,12 +23,18 @@ interface Seat {
   rejoinToken: string;
 }
 
+/** The running match loop, as the room and connections see it. */
+export interface MatchHandle {
+  input(slot: Slot, input: PlayerInput): void;
+  stop(): void;
+}
+
 export type RoomResult = { ok: true } | { ok: false; code: ErrorCode; message: string };
 const OK: RoomResult = { ok: true };
 const err = (code: ErrorCode, message: string): RoomResult => ({ ok: false, code, message });
 
 export interface RoomHooks {
-  /** Called once when the host starts the match. T05 replaces the stub that is passed here. */
+  /** Called once when the host starts the match, with the room in INTRO and bots seated. */
   onMatchStart(room: Room): void;
 }
 
@@ -37,6 +44,8 @@ export class Room {
   host: Slot = 0;
   /** Requested bot count (host setting). Empty seats are always filled with bots at start. */
   botCount = 0;
+  /** Set while a match loop runs for this room. */
+  match: MatchHandle | null = null;
   private readonly seats: (Seat | null)[] = Array.from({ length: MAX_PLAYERS }, () => null);
 
   constructor(

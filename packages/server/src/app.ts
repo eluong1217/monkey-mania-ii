@@ -3,7 +3,7 @@ import { createServer, type Server } from 'node:http';
 import { extname, join, normalize } from 'node:path';
 import { WebSocketServer } from 'ws';
 import { Connection } from './connection.js';
-import { startMatchStub } from './match.js';
+import { startMatch } from './match.js';
 import type { RoomHooks } from './room.js';
 import { RoomManager } from './rooms.js';
 
@@ -24,7 +24,7 @@ export interface AppOptions {
 /** HTTP server that serves the built client, /healthz, and a WebSocket endpoint at /ws. */
 export function createApp(clientDir: string, options: AppOptions = {}): Server {
   const rooms = new RoomManager({
-    hooks: options.hooks ?? { onMatchStart: startMatchStub },
+    hooks: options.hooks ?? { onMatchStart: (room) => startMatch(room, 'sandbox') },
     emptyTimeoutMs: options.emptyTimeoutMs,
   });
   const server = createServer((req, res) => {
