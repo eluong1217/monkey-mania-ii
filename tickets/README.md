@@ -46,7 +46,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | Wave | Ticket | Assignee | Depends on | Status |
 |---|---|---|---|---|
 | 3+ | [T10 Mini-game: Fruit Frenzy](T10-fruit-frenzy.md) | Sonnet | T02, T08 | done |
-| 3+ | [T11 Mini-game: Coconut Dodge](T11-coconut-dodge.md) | Sonnet | T02, T08 | todo |
+| 3+ | [T11 Mini-game: Coconut Dodge](T11-coconut-dodge.md) | Sonnet | T02, T08 | done |
 | 3+ | [T12 Mini-game: Banana Heist](T12-banana-heist.md) | Sonnet | T02, T08 | todo |
 | 3+ | [T13 Mini-game: King of the Stump](T13-king-of-the-stump.md) | Sonnet | T02, T08 | todo |
 | 7 | [T09 Party flow](T09-party-flow.md) | Sonnet | T07 | done |
@@ -68,6 +68,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 9 | [T16 Integrate final art](T16-integrate-art.md) | Sonnet | T15, A02–A04 | review |
 | 9 | [T17 Juice and audio](T17-juice-audio.md) | Sonnet | T15, A05, T09 | todo |
 | 9 | [T18 HUD and UI polish](T18-ui-polish.md) | Sonnet | T09, T15 | todo |
+| 9 | [T25 Mini-game action animation](T25-action-animation-hints.md) | Sonnet | T16, T10–T13 | todo |
 
 **Milestone M3:** the game looks and sounds finished.
 

@@ -1,3 +1,4 @@
+import { createCoconutDodgeBot } from '../minigames/coconut-dodge/bot.js';
 import { createFruitFrenzyBot } from '../minigames/fruit-frenzy/bot.js';
 import { createWanderBot } from './wander.js';
 import type { Bot, BotFactory } from './types.js';
@@ -8,6 +9,7 @@ import type { Bot, BotFactory } from './types.js';
  */
 export const botFactories: Record<string, BotFactory> = {
   'fruit-frenzy': createFruitFrenzyBot,
+  'coconut-dodge': createCoconutDodgeBot,
 };
 
 /** The mini-game's bot, or the wander bot when it has none. */

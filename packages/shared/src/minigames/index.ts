@@ -1,4 +1,5 @@
 import type { AnyMiniGame } from '../minigame.js';
+import { coconutDodge } from './coconut-dodge/index.js';
 import { fruitFrenzy } from './fruit-frenzy/index.js';
 import { sandbox } from './sandbox/index.js';
 
@@ -6,6 +7,7 @@ import { sandbox } from './sandbox/index.js';
 export const miniGames: Readonly<Record<string, AnyMiniGame>> = {
   [sandbox.id]: sandbox,
   [fruitFrenzy.id]: fruitFrenzy,
+  [coconutDodge.id]: coconutDodge,
 };
 
 export function getMiniGame(id: string): AnyMiniGame | undefined {

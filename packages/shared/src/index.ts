@@ -17,3 +17,9 @@ export {
   type FruitKind,
   type FruitView,
 } from './minigames/fruit-frenzy/index.js';
+export {
+  coconutDodge,
+  type CoconutDodgeState,
+  type CoconutDodgeSnapshot,
+  type CoconutView,
+} from './minigames/coconut-dodge/index.js';
