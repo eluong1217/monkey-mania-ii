@@ -25,8 +25,10 @@ const game = new Phaser.Game({
   width: LOGICAL_SIZE.width,
   height: LOGICAL_SIZE.height,
   backgroundColor: '#1d7a4a',
-  pixelArt: true,
-  roundPixels: true,
+  // The art is pre-rendered low-poly, not pixel art: keep smooth filtering.
+  pixelArt: false,
+  antialias: true,
+  roundPixels: false,
   scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: [new PreloadScene(), new PlayScene(net)],
 });

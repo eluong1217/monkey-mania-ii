@@ -59,13 +59,13 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 
 | Wave | Ticket | Assignee | Depends on | Status |
 |---|---|---|---|---|
-| any | [A01 Style sheet](A01-style-sheet.md) | Gemini + you | — | todo |
-| any | [A02 Monkey sprites](A02-monkey-sprites.md) | Gemini + you | A01 | todo |
-| any | [A03 Fruit, props, UI icons](A03-props-icons.md) | Gemini + you | A01 | todo |
-| any | [A04 Backgrounds and title art](A04-backgrounds.md) | Gemini + you | A01 | todo |
+| any | [A01 Style sheet](A01-style-sheet.md) | Gemini + you | — | done |
+| any | [A02 Monkey sprites](A02-monkey-sprites.md) | Gemini + you | A01 | done |
+| any | [A03 Fruit, props, UI icons](A03-props-icons.md) | Gemini + you | A01 | done |
+| any | [A04 Backgrounds and title art](A04-backgrounds.md) | Gemini + you | A01 | done |
 | any | [A05 Sound effects and music](A05-audio.md) | You | — | todo |
 | 7 | [T15 Asset manifest and loader](T15-asset-loader.md) | Sonnet | T07 | done |
-| 9 | [T16 Integrate final art](T16-integrate-art.md) | Sonnet | T15, A02–A04 | todo |
+| 9 | [T16 Integrate final art](T16-integrate-art.md) | Sonnet | T15, A02–A04 | review |
 | 9 | [T17 Juice and audio](T17-juice-audio.md) | Sonnet | T15, A05, T09 | todo |
 | 9 | [T18 HUD and UI polish](T18-ui-polish.md) | Sonnet | T09, T15 | todo |
 
