@@ -32,7 +32,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 |---|---|---|---|---|
 | 1 | [T01 Repo scaffold](T01-repo-scaffold.md) | Sonnet | — | done |
 | 2 | [T02 Simulation core](T02-sim-core.md) | Opus | T01 | done |
-| 3 | [T03 Network protocol](T03-protocol.md) | Sonnet | T02 | todo |
+| 3 | [T03 Network protocol](T03-protocol.md) | Sonnet | T02 | done |
 | 3 | [T08 Bot framework](T08-bot-framework.md) | Sonnet | T02 | todo |
 | 4 | [T04 Rooms and lobby server](T04-rooms-lobby.md) | Sonnet | T03 | todo |
 | 4 | [T06 Client shell and lobby screens](T06-client-shell.md) | Sonnet | T03 | todo |
