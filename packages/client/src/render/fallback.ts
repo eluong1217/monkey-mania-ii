@@ -1,18 +1,16 @@
 import type { BaseSnapshot } from '@monkey-mania-2/shared';
-import { slotColor, type RenderScene } from './types';
+import { monkeyKey } from '../assets/manifest';
+import type { RenderScene } from './types';
 
 export function drawTimer(snapshot: BaseSnapshot, scene: RenderScene): void {
   if (snapshot.timeLeft !== undefined) scene.text(320, 12, String(Math.ceil(snapshot.timeLeft)));
 }
 
-/** Players as slot-coloured circles with "P1".."P4" labels; the local one gets a white ring. */
+/** Players as monkey sprites (idle frame); the local one gets a white ring. */
 export function drawPlayers(snapshot: BaseSnapshot, scene: RenderScene): void {
   for (const p of snapshot.players) {
-    scene.circle(p.x, p.y, p.r, slotColor(p.slot));
     if (p.slot === scene.localSlot) scene.ring(p.x, p.y, p.r + 2, 0xffffff, 2);
-    // Above the circle, or below it when that would leave the screen.
-    const above = p.y - p.r - 8;
-    scene.text(p.x, above < 6 ? p.y + p.r + 8 : above, `P${p.slot + 1}`);
+    scene.sprite(monkeyKey(p.slot), 0, p.x, p.y);
   }
 }
 

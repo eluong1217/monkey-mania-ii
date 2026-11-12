@@ -8,6 +8,8 @@ export interface RenderScene {
   /** The local player's slot, or null when spectating/not seated. */
   readonly localSlot: Slot | null;
   circle(x: number, y: number, r: number, fill: number, alpha?: number): void;
+  /** A frame of a manifest sprite sheet centred on x,y (a placeholder when the art is missing). */
+  sprite(key: string, frame: number, x: number, y: number): void;
   ring(x: number, y: number, r: number, color: number, width?: number): void;
   text(x: number, y: number, text: string, opts?: { color?: string; size?: number }): void;
 }

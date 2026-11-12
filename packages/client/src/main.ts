@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PreloadScene } from './assets/preload-scene';
 import { LOGICAL_SIZE } from './config';
 import { Connection, createBrowserSocket } from './connection';
 import { mountDebugOverlay } from './debug-overlay';
@@ -27,7 +28,7 @@ const game = new Phaser.Game({
   pixelArt: true,
   roundPixels: true,
   scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [new PlayScene(net)],
+  scene: [new PreloadScene(), new PlayScene(net)],
 });
 
 /** Integer-scale the 640x360 canvas to the largest whole multiple that fits the window. */

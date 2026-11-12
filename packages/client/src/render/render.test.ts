@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { BaseSnapshot } from '@monkey-mania-2/shared';
-import { fallbackRenderer, getRenderer, renderers, slotColor, type RenderScene } from './index';
+import { fallbackRenderer, getRenderer, renderers, type RenderScene } from './index';
 
 function recorder(localSlot: number | null = 0) {
   const calls: string[] = [];
   const scene: RenderScene = {
     localSlot,
+    sprite: (key, frame, x, y) => calls.push(`sprite ${key}:${frame} ${x},${y}`),
     circle: (x, y, r, fill) => calls.push(`circle ${x},${y},${r} #${fill.toString(16)}`),
     ring: (x, y) => calls.push(`ring ${x},${y}`),
     text: (x, y, t) => calls.push(`text ${t}`),
@@ -30,22 +31,21 @@ describe('renderer registry', () => {
     expect(getRenderer('toString')).toBe(fallbackRenderer);
   });
 
-  it('fallback draws every entity and player, labels slots and marks the local player', () => {
+  it('fallback draws every entity and player sprite and marks the local player', () => {
     const { scene, calls } = recorder(3);
     fallbackRenderer(snap, scene);
     expect(calls).toContain('circle 100,100,6 #dddddd');
-    expect(calls).toContain(`circle 10,20,12 #${slotColor(0).toString(16)}`);
-    expect(calls).toContain('text P1');
-    expect(calls).toContain('text P4');
+    expect(calls).toContain('sprite monkey_red_top:0 10,20');
+    expect(calls).toContain('sprite monkey_green_top:0 50,60');
     expect(calls).toContain('text B');
     expect(calls).toContain('ring 50,60');
     expect(calls).toContain('text 10');
   });
 
-  it('sandbox draws players with labels', () => {
+  it('sandbox draws player sprites', () => {
     const { scene, calls } = recorder(0);
     getRenderer('sandbox')({ ...snap, pushReadyAt: [0, 0, 0, 0] } as BaseSnapshot, scene);
-    expect(calls).toContain('text P1');
+    expect(calls).toContain('sprite monkey_red_top:0 10,20');
     expect(calls).toContain('ring 10,20');
   });
 });

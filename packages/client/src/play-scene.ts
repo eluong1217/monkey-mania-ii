@@ -6,6 +6,8 @@ import { getRenderer, type RenderScene } from './render';
 export class PlayScene extends Phaser.Scene implements RenderScene {
   private gfx!: Phaser.GameObjects.Graphics;
   private labels: Phaser.GameObjects.Text[] = [];
+  private sprites: Phaser.GameObjects.Sprite[] = [];
+  private usedSprites = 0;
   private used = 0;
 
   constructor(private readonly net: NetGame) {
@@ -23,6 +25,7 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
   override update(): void {
     this.gfx.clear();
     this.used = 0;
+    this.usedSprites = 0;
     const view = this.net.frame();
     const { phase, intro, miniGameId } = this.net;
     if (phase === 'INTRO' && intro) {
@@ -32,10 +35,22 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
       getRenderer(miniGameId)(view, this);
     }
     for (let i = this.used; i < this.labels.length; i++) this.labels[i]?.setVisible(false);
+    for (let i = this.usedSprites; i < this.sprites.length; i++) this.sprites[i]?.setVisible(false);
   }
 
   circle(x: number, y: number, r: number, fill: number, alpha = 1): void {
     this.gfx.fillStyle(fill, alpha).fillCircle(x, y, r);
+  }
+
+  sprite(key: string, frame: number, x: number, y: number): void {
+    let s = this.sprites[this.usedSprites];
+    if (!s) {
+      s = this.add.sprite(0, 0, key);
+      this.sprites.push(s);
+    }
+    this.usedSprites++;
+    if (s.texture.key !== key) s.setTexture(key);
+    s.setFrame(frame).setVisible(true).setPosition(Math.round(x), Math.round(y));
   }
 
   ring(x: number, y: number, r: number, color: number, width = 1): void {

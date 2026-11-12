@@ -1,0 +1,759 @@
+{
+  "images": [
+    {
+      "key": "apple",
+      "file": "sprites/props/apple.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "banana",
+      "file": "sprites/props/banana.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "pineapple_golden",
+      "file": "sprites/props/pineapple_golden.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "rotten_fruit",
+      "file": "sprites/props/rotten_fruit.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "coconut",
+      "file": "sprites/props/coconut.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "coconut_shadow_target",
+      "file": "sprites/props/coconut_shadow_target.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "banana_pile",
+      "file": "sprites/props/banana_pile.png",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "key": "stash_red",
+      "file": "sprites/props/stash_red.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "stash_blue",
+      "file": "sprites/props/stash_blue.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "stash_green",
+      "file": "sprites/props/stash_green.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "stash_yellow",
+      "file": "sprites/props/stash_yellow.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "stun_stars",
+      "file": "sprites/props/stun_stars.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "dust_puff",
+      "file": "sprites/props/dust_puff.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "splat",
+      "file": "sprites/props/splat.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "tree_stump_platform",
+      "file": "sprites/props/tree_stump_platform.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "key": "bg_fruit-frenzy",
+      "file": "backgrounds/fruit-frenzy.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "bg_coconut-dodge",
+      "file": "backgrounds/coconut-dodge.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "bg_banana-heist",
+      "file": "backgrounds/banana-heist.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "bg_king-of-the-stump",
+      "file": "backgrounds/king-of-the-stump.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "bg_title",
+      "file": "backgrounds/title.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "bg_lobby",
+      "file": "backgrounds/lobby.png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "key": "button_normal",
+      "file": "ui/button_normal.png",
+      "width": 96,
+      "height": 64
+    },
+    {
+      "key": "button_focused",
+      "file": "ui/button_focused.png",
+      "width": 96,
+      "height": 64
+    },
+    {
+      "key": "button_pressed",
+      "file": "ui/button_pressed.png",
+      "width": 96,
+      "height": 64
+    },
+    {
+      "key": "panel_frame",
+      "file": "ui/panel_frame.png",
+      "width": 256,
+      "height": 208
+    },
+    {
+      "key": "ready_tick",
+      "file": "ui/ready_tick.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "crown",
+      "file": "ui/crown.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "timer_icon",
+      "file": "ui/timer_icon.png",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "key": "seat_badge_red",
+      "file": "ui/seat_badge_red.png",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "key": "seat_badge_blue",
+      "file": "ui/seat_badge_blue.png",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "key": "seat_badge_yellow",
+      "file": "ui/seat_badge_yellow.png",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "key": "seat_badge_green",
+      "file": "ui/seat_badge_green.png",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "key": "cooldown_ring",
+      "file": "ui/cooldown_ring.png",
+      "width": 96,
+      "height": 96
+    }
+  ],
+  "sheets": [
+    {
+      "key": "monkey_red_top",
+      "file": "sprites/monkeys/monkey_red_top.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_blue_top",
+      "file": "sprites/monkeys/monkey_blue_top.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_yellow_top",
+      "file": "sprites/monkeys/monkey_yellow_top.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_green_top",
+      "file": "sprites/monkeys/monkey_green_top.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_red_side",
+      "file": "sprites/monkeys/monkey_red_side.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_blue_side",
+      "file": "sprites/monkeys/monkey_blue_side.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_yellow_side",
+      "file": "sprites/monkeys/monkey_yellow_side.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "key": "monkey_green_side",
+      "file": "sprites/monkeys/monkey_green_side.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 7,
+      "animations": [
+        {
+          "name": "idle",
+          "start": 0,
+          "end": 0,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "start": 1,
+          "end": 2,
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "shove",
+          "start": 3,
+          "end": 3,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "stunned",
+          "start": 4,
+          "end": 4,
+          "fps": 1,
+          "loop": true
+        },
+        {
+          "name": "out",
+          "start": 5,
+          "end": 5,
+          "fps": 1,
+          "loop": false
+        },
+        {
+          "name": "win",
+          "start": 6,
+          "end": 6,
+          "fps": 1,
+          "loop": true
+        }
+      ]
+    }
+  ],
+  "audio": [
+    {
+      "key": "ui_move",
+      "file": "audio/ui_move.ogg",
+      "music": false
+    },
+    {
+      "key": "ui_confirm",
+      "file": "audio/ui_confirm.ogg",
+      "music": false
+    },
+    {
+      "key": "ui_back",
+      "file": "audio/ui_back.ogg",
+      "music": false
+    },
+    {
+      "key": "ui_ready",
+      "file": "audio/ui_ready.ogg",
+      "music": false
+    },
+    {
+      "key": "countdown_beep",
+      "file": "audio/countdown_beep.ogg",
+      "music": false
+    },
+    {
+      "key": "countdown_go",
+      "file": "audio/countdown_go.ogg",
+      "music": false
+    },
+    {
+      "key": "shove",
+      "file": "audio/shove.ogg",
+      "music": false
+    },
+    {
+      "key": "stun",
+      "file": "audio/stun.ogg",
+      "music": false
+    },
+    {
+      "key": "eliminated",
+      "file": "audio/eliminated.ogg",
+      "music": false
+    },
+    {
+      "key": "round_win",
+      "file": "audio/round_win.ogg",
+      "music": false
+    },
+    {
+      "key": "match_win",
+      "file": "audio/match_win.ogg",
+      "music": false
+    },
+    {
+      "key": "point_tick",
+      "file": "audio/point_tick.ogg",
+      "music": false
+    },
+    {
+      "key": "ff_catch_apple",
+      "file": "audio/ff_catch_apple.ogg",
+      "music": false
+    },
+    {
+      "key": "ff_catch_banana",
+      "file": "audio/ff_catch_banana.ogg",
+      "music": false
+    },
+    {
+      "key": "ff_catch_pineapple",
+      "file": "audio/ff_catch_pineapple.ogg",
+      "music": false
+    },
+    {
+      "key": "ff_rotten",
+      "file": "audio/ff_rotten.ogg",
+      "music": false
+    },
+    {
+      "key": "cd_whistle",
+      "file": "audio/cd_whistle.ogg",
+      "music": false
+    },
+    {
+      "key": "cd_impact",
+      "file": "audio/cd_impact.ogg",
+      "music": false
+    },
+    {
+      "key": "cd_roll",
+      "file": "audio/cd_roll.ogg",
+      "music": false
+    },
+    {
+      "key": "bh_pickup",
+      "file": "audio/bh_pickup.ogg",
+      "music": false
+    },
+    {
+      "key": "bh_deposit",
+      "file": "audio/bh_deposit.ogg",
+      "music": false
+    },
+    {
+      "key": "bh_steal",
+      "file": "audio/bh_steal.ogg",
+      "music": false
+    },
+    {
+      "key": "bh_throw",
+      "file": "audio/bh_throw.ogg",
+      "music": false
+    },
+    {
+      "key": "bh_hit",
+      "file": "audio/bh_hit.ogg",
+      "music": false
+    },
+    {
+      "key": "kots_hit",
+      "file": "audio/kots_hit.ogg",
+      "music": false
+    },
+    {
+      "key": "kots_fall",
+      "file": "audio/kots_fall.ogg",
+      "music": false
+    },
+    {
+      "key": "music_lobby",
+      "file": "audio/music_lobby.ogg",
+      "music": true
+    },
+    {
+      "key": "music_gameplay",
+      "file": "audio/music_gameplay.ogg",
+      "music": true
+    },
+    {
+      "key": "music_results",
+      "file": "audio/music_results.ogg",
+      "music": true
+    }
+  ]
+}
