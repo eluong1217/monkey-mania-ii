@@ -37,7 +37,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 4 | [T04 Rooms and lobby server](T04-rooms-lobby.md) | Sonnet | T03 | done |
 | 4 | [T06 Client shell and lobby screens](T06-client-shell.md) | Sonnet | T03 | done |
 | 5 | [T05 Authoritative match loop](T05-match-loop.md) | Opus | T04, T08 | done |
-| 6 | [T07 Client netcode and rendering](T07-client-netcode.md) | Opus | T05, T06 | todo |
+| 6 | [T07 Client netcode and rendering](T07-client-netcode.md) | Opus | T05, T06 | review |
 
 **Milestone M1:** four seats (any mix of browsers and bots) join a room by link and move around a sandbox arena.
 

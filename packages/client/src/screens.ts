@@ -6,7 +6,7 @@ import {
   type ServerMessage,
   type Slot,
 } from '@monkey-mania-2/shared';
-import { Connection, createBrowserSocket, loadSaved, save } from './connection';
+import { loadSaved, save, type Connection } from './connection';
 
 type RoomState = Extract<ServerMessage, { type: 'roomState' }>;
 
@@ -22,13 +22,15 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 /** Plain DOM menus over the game canvas: Home, Lobby, and a disconnected state. */
 export class Screens {
-  private conn = new Connection(createBrowserSocket);
   private slot: Slot | null = null;
   private room: RoomState | null = null;
   private error = '';
   private readonly inviteCode: string;
 
-  constructor(private readonly root: HTMLElement) {
+  constructor(
+    private readonly root: HTMLElement,
+    private readonly conn: Connection,
+  ) {
     this.inviteCode = (new URLSearchParams(location.search).get('room') ?? '')
       .toUpperCase()
       .slice(0, ROOM_CODE_LENGTH);
@@ -82,6 +84,15 @@ export class Screens {
   }
 
   private render(): void {
+    // During a round the canvas is the screen; menus come back for results and the podium.
+    const playing =
+      this.conn.status === 'open' &&
+      (this.room?.phase === 'INTRO' || this.room?.phase === 'PLAYING');
+    this.root.hidden = playing;
+    if (playing) {
+      (document.activeElement as HTMLElement | null)?.blur();
+      return;
+    }
     this.root.replaceChildren(
       this.room
         ? this.conn.status === 'closed'
@@ -217,9 +228,7 @@ export class Screens {
 
     ready.setAttribute('autofocus', '');
     const status =
-      room.phase === 'LOBBY'
-        ? ''
-        : `Match in progress (${room.phase}). Gameplay arrives in a later ticket.`;
+      room.phase === 'LOBBY' ? '' : room.phase === 'RESULTS' ? 'Round over.' : 'Match over.';
     return el(
       'main',
       { className: 'screen' },
