@@ -158,7 +158,6 @@ describe('coconut-dodge bots', () => {
     }
     lengths.sort((a, b) => a - b);
     const median = (lengths[49]! + lengths[50]!) / 2;
-    console.log(`coconut-dodge median round length: ${median.toFixed(1)} s`);
     expect(median).toBeGreaterThanOrEqual(15);
     expect(median).toBeLessThanOrEqual(40);
   });

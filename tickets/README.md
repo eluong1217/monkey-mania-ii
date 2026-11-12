@@ -47,7 +47,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 |---|---|---|---|---|
 | 3+ | [T10 Mini-game: Fruit Frenzy](T10-fruit-frenzy.md) | Sonnet | T02, T08 | done |
 | 3+ | [T11 Mini-game: Coconut Dodge](T11-coconut-dodge.md) | Sonnet | T02, T08 | done |
-| 3+ | [T12 Mini-game: Banana Heist](T12-banana-heist.md) | Sonnet | T02, T08 | todo |
+| 3+ | [T12 Mini-game: Banana Heist](T12-banana-heist.md) | Sonnet | T02, T08 | done |
 | 3+ | [T13 Mini-game: King of the Stump](T13-king-of-the-stump.md) | Sonnet | T02, T08 | todo |
 | 7 | [T09 Party flow](T09-party-flow.md) | Sonnet | T07 | done |
 | 7 | [T14 Balance harness](T14-balance-harness.md) | Haiku | T10–T13 | todo |

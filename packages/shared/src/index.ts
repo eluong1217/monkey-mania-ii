@@ -23,3 +23,10 @@ export {
   type CoconutDodgeSnapshot,
   type CoconutView,
 } from './minigames/coconut-dodge/index.js';
+export {
+  bananaHeist,
+  stashPosition,
+  type BananaHeistState,
+  type BananaHeistSnapshot,
+  type HeistView,
+} from './minigames/banana-heist/index.js';

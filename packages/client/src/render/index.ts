@@ -1,3 +1,4 @@
+import { bananaHeistRenderer } from './banana-heist';
 import { coconutDodgeRenderer } from './coconut-dodge';
 import { fallbackRenderer } from './fallback';
 import { fruitFrenzyRenderer } from './fruit-frenzy';
@@ -13,6 +14,7 @@ export const renderers: Readonly<Record<string, Renderer>> = {
   sandbox: sandboxRenderer,
   'fruit-frenzy': fruitFrenzyRenderer,
   'coconut-dodge': coconutDodgeRenderer,
+  'banana-heist': bananaHeistRenderer,
 };
 
 export function getRenderer(miniGameId: string): Renderer {
