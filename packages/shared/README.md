@@ -21,6 +21,24 @@ export const myGame: MiniGame<MyState, MySnapshot> = {
 
 4. Register it: add one line to `src/minigames/index.ts`. Do not touch any other mini-game.
 
+## Writing a bot
+
+A bot is `{ decide(snapshot, mySlot, tick, rng) → PlayerInput }` (`src/bots/types.ts`). It sees only the snapshot, so it can never know more than a human. Use the `rng` argument for randomness, and closure variables for per-seat memory.
+
+```ts
+export const createMyGameBot = (): Bot => ({
+  decide(snapshot, me, tick, rng) {
+    const self = snapshot.players.find((p) => p.slot === me)!;
+    const fruit = pickNearest(self, snapshot.entities ?? []);
+    return toInput(fruit ? seek(self, fruit) : { x: 0, y: 0 });
+  },
+});
+```
+
+Register it with one line in `src/bots/registry.ts`: `botFactories['my-game'] = createMyGameBot;`. Games without a bot get the wander bot (`createBotFor(id)`).
+
+Write the bot at full strength; difficulty is applied on top. `withDifficulty(bot, DIFFICULTIES.normal, seed)` returns an `InputFn` (usable in `runRound` and by the server) that decides from a snapshot `reactionTicks` old, rotates the move direction by seeded noise, and sometimes freezes. Presets: `easy`, `normal`, `hard`. Call it exactly once per tick. Steering helpers: `seek`, `flee`, `keepAwayFromEdge`, `pickNearest`, `distance`, `toInput`. Names: `pickBotNames(count, rng)`.
+
 ## Rules
 
 - **Determinism.** `step` may mutate `state` and returns the next state. Its result may depend only on its arguments and the RNG stored in state (`createRng(seed)`, then `nextFloat`, `nextInt`, `nextRange`, `chance`, `pick`). Same seed + same inputs must give identical snapshots.

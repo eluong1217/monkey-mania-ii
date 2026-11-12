@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T02
-- **Status:** todo
+- **Status:** done
 
 ## Goal
 A common way to write a bot per mini-game, with a difficulty dial that makes bots beatable and human-looking.
@@ -23,3 +23,12 @@ A common way to write a bot per mini-game, with a difficulty dial that makes bot
 Bots for specific mini-games (each mini-game ticket writes its own).
 
 ## Handoff
+Built `packages/shared/src/bots/`: `types.ts` (`Bot`, `BotFactory`, `Difficulty`), `steering.ts` (`seek`, `flee`, `keepAwayFromEdge`, `pickNearest`, `distance`, `toInput`), `difficulty.ts` (`DIFFICULTIES` easy/normal/hard, `withDifficulty(bot, difficulty, seed) → InputFn`), `wander.ts` (fallback bot), `names.ts` (`BOT_NAMES`, `pickBotNames(count, rng)`), `registry.ts` (`botFactories`, `createBotFor(miniGameId)`). Re-exported from `shared/src/index.ts`; README has a "Writing a bot" section.
+
+Verified: `npm test`, `npm run build`, `npm run lint` pass. `bots.test.ts` covers the reaction delay (exact ticks seen), seeded and bounded noise, hesitation, steering helpers, names, and a four-wander-bot sandbox round that is byte-identical across runs for one seed.
+
+For later tickets:
+- `withDifficulty` returns an `InputFn`, so it plugs straight into `runRound`. It is stateful (snapshot history, RNG): create one per seat and call it exactly once per tick. T05 should create it at match start with a per-seat seed.
+- Registry is a factory map (`botFactories[id] = factory`) so bots can hold per-seat state. Mini-game tickets add one line there.
+- Bots should be written at full strength; the wrapper handles weakening. Before the history fills, the wrapper uses the oldest snapshot it has.
+- The wrapper's hesitation returns neutral input (including no action).
