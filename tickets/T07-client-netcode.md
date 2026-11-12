@@ -2,7 +2,7 @@
 
 - **Assignee:** Opus
 - **Depends on:** T05, T06
-- **Status:** review
+- **Status:** done
 
 ## Goal
 The round is visible and feels responsive: your monkey reacts instantly, everyone else moves smoothly.
