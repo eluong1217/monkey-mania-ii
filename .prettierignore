@@ -1,0 +1,9 @@
+dist
+node_modules
+reference
+assets
+art-previews
+docs
+tickets
+CLAUDE.MD
+package-lock.json

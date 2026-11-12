@@ -1,0 +1,14 @@
+{
+  "name": "@monkey-mania-2/client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p . && vite build"
+  },
+  "dependencies": {
+    "phaser": "^4.2.1",
+    "vite": "^8.3.8"
+  }
+}
