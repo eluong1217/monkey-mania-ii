@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { LOGICAL_SIZE } from './config';
+import { Screens } from './screens';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -22,3 +23,6 @@ function fit(): void {
 }
 fit();
 addEventListener('resize', fit);
+
+const ui = document.getElementById('ui');
+if (ui) new Screens(ui);
