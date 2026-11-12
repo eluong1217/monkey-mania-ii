@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T02, T08
-- **Status:** todo
+- **Status:** done
 
 ## Goal
 The original Monkey Mania, as a four-way scramble. Rules are in `docs/DESIGN.md`.
@@ -23,3 +23,18 @@ The original Monkey Mania, as a four-way scramble. Rules are in `docs/DESIGN.md`
 Final art, sound, changes to other mini-games or shared core.
 
 ## Handoff
+
+**Built**
+- `packages/shared/src/minigames/fruit-frenzy/index.ts`: the `MiniGame` (side view, 40 s) with the exported `tuning`; `bot.ts`: the bot, registered in `bots/registry.ts`. The game is registered in `minigames/index.ts` and exported from the shared index (`fruitFrenzy`, `FruitFrenzySnapshot`, `FruitView`).
+- `packages/client/src/render/fruit-frenzy.ts`: placeholder renderer (fruit sprites or labelled shapes, scores along the top, shove-ready halo), registered in `render/index.ts`.
+- Monkeys sit at `tuning.groundY` (298) and move on x only; `moveY` is ignored.
+- Fruit spawn from a shuffled bag of 8 lanes across the width, so spawns spread out. Spawn interval goes 1.0 s to 0.35 s linearly. Fall time times `moveSpeed` stays at least half the arena width for every fruit kind (asserted in tests). Golden pineapples drift sideways and bounce off the spawn margins.
+- Snapshot extras: `scores`, `stunnedUntil`, `shoveReadyAt` (per slot index); fruit entities carry `vx`, `vy`. The bot uses them to predict where fruit will land.
+- Rotten fruit can take a score below zero (no floor). Stunned monkeys cannot catch. Shove is a dash in the facing direction that bumps overlapped rivals.
+
+**Verified**
+- `npm test` (9 new sim/bot tests: scoring, rotten penalty and stun, shove displacement and cooldown, 40 s end, ties, spawn spread and reachability, speed-up, determinism, 100 seeded 4-bot rounds with a positive top score), `npm run build` and `npm run lint` pass.
+- One round played in the browser by the user with the id forced; looked fine. Shove (Space) was not separately checked online.
+
+**For later tickets**
+- Because the game is in the registry, T09's mini-game pool will include it automatically; T14 balance numbers all live in `tuning`.

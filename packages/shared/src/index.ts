@@ -10,3 +10,10 @@ export * from './minigames/index.js';
 export { sandbox, type SandboxState, type SandboxSnapshot } from './minigames/sandbox/index.js';
 export * from './protocol/index.js';
 export * from './bots/index.js';
+export {
+  fruitFrenzy,
+  type FruitFrenzyState,
+  type FruitFrenzySnapshot,
+  type FruitKind,
+  type FruitView,
+} from './minigames/fruit-frenzy/index.js';

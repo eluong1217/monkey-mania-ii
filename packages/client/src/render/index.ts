@@ -1,4 +1,5 @@
 import { fallbackRenderer } from './fallback';
+import { fruitFrenzyRenderer } from './fruit-frenzy';
 import { sandboxRenderer } from './sandbox';
 import type { Renderer } from './types';
 
@@ -9,6 +10,7 @@ import type { Renderer } from './types';
  */
 export const renderers: Readonly<Record<string, Renderer>> = {
   sandbox: sandboxRenderer,
+  'fruit-frenzy': fruitFrenzyRenderer,
 };
 
 export function getRenderer(miniGameId: string): Renderer {
