@@ -34,7 +34,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 2 | [T02 Simulation core](T02-sim-core.md) | Opus | T01 | done |
 | 3 | [T03 Network protocol](T03-protocol.md) | Sonnet | T02 | done |
 | 3 | [T08 Bot framework](T08-bot-framework.md) | Sonnet | T02 | todo |
-| 4 | [T04 Rooms and lobby server](T04-rooms-lobby.md) | Sonnet | T03 | todo |
+| 4 | [T04 Rooms and lobby server](T04-rooms-lobby.md) | Sonnet | T03 | done |
 | 4 | [T06 Client shell and lobby screens](T06-client-shell.md) | Sonnet | T03 | todo |
 | 5 | [T05 Authoritative match loop](T05-match-loop.md) | Opus | T04, T08 | todo |
 | 6 | [T07 Client netcode and rendering](T07-client-netcode.md) | Opus | T05, T06 | todo |
