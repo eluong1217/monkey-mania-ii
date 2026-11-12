@@ -154,7 +154,8 @@ describe('match loop', () => {
     const rr = sent[result] as Extract<ServerMessage, { type: 'roundResult' }>;
     expect(rr.placements).toEqual(expected.placements);
     expect(rr.placements).toEqual([[0], [1], [2], [3]]);
-    expect(rr.scores.map((s) => s.points)).toEqual([3, 2, 1, 0]);
+    // A one-round match: its only round is the final one, so points are doubled.
+    expect(rr.scores.map((s) => s.points)).toEqual([6, 4, 2, 0]);
     expect(types).toContain('matchResult');
 
     const phases = sent.flatMap((m) => (m.type === 'roomState' ? [m.phase] : []));
@@ -306,6 +307,116 @@ describe('match loop', () => {
     expect(() => m.input(0, { moveX: 1, moveY: 0, action: true })).not.toThrow();
     m.stop();
     expect(clock.timers).toHaveLength(0);
+  });
+});
+
+describe('party flow', () => {
+  const ROUND_TICKS = INTRO_TICKS + PLAY_TICKS + RESULTS_TICKS;
+
+  it('a bot-only match runs headlessly through five rounds to the podium', () => {
+    const clock = new FakeClock();
+    const room = fakeRoom();
+    let ended = '';
+    const m = new Match(room, [sandbox], { clock, seed: 11, onEnd: (r) => (ended = r) });
+    room.match = m;
+    m.start();
+    clock.advance(PERIOD * ROUND_TICKS * 5);
+    expect(ended).toBe('finished');
+    expect(room.phase).toBe('PODIUM');
+    expect(room.match).toBeNull();
+    expect(clock.timers).toHaveLength(0);
+
+    const intros = room.sent.filter((x) => x.type === 'roundIntro');
+    expect(intros.map((i) => (i as { round: number }).round)).toEqual([1, 2, 3, 4, 5]);
+    const results = room.sent.filter(
+      (x): x is Extract<ServerMessage, { type: 'roundResult' }> => x.type === 'roundResult',
+    );
+    expect(results).toHaveLength(5);
+    // Totals only ever go up, and the last round is worth double.
+    const lastTotals = results.map((r) => r.scores.map((s) => s.total));
+    const points = results.map((r) => r.scores.map((s) => s.points));
+    expect(points[4]!.reduce((a, b) => a + b, 0)).toBe(2 * points[3]!.reduce((a, b) => a + b, 0));
+    for (let i = 1; i < 5; i++)
+      lastTotals[i]!.forEach((t, slot) =>
+        expect(t).toBe(lastTotals[i - 1]![slot]! + points[i]![slot]!),
+      );
+
+    const match = room.sent.find((x) => x.type === 'matchResult') as Extract<
+      ServerMessage,
+      { type: 'matchResult' }
+    >;
+    expect(match.totals.map((t) => t.total)).toEqual(lastTotals[4]);
+    expect(match.placements.flat().sort()).toEqual([0, 1, 2, 3]);
+  });
+
+  it('replays the same match from the same seed', () => {
+    const run = () => {
+      const clock = new FakeClock();
+      const room = fakeRoom();
+      const m = new Match(room, [sandbox], { clock, seed: 5 });
+      room.match = m;
+      m.start();
+      clock.advance(PERIOD * ROUND_TICKS * 5);
+      return JSON.stringify(room.sent);
+    };
+    expect(run()).toBe(run());
+  });
+
+  it('picks from the whole pool and never repeats until it is used up', () => {
+    const clone = (id: string): AnyMiniGame => ({ ...sandbox, id });
+    const clock = new FakeClock();
+    const room = fakeRoom();
+    const m = new Match(room, ['a', 'b', 'c', 'd', 'e'].map(clone), { clock, seed: 3 });
+    room.match = m;
+    m.start();
+    clock.advance(PERIOD * ROUND_TICKS * 5);
+    const ids = room.sent.flatMap((x) => (x.type === 'roundIntro' ? [x.miniGameId] : []));
+    expect(new Set(ids).size).toBe(5);
+  });
+
+  it('replaces a human who leaves mid-match with a bot', () => {
+    const clock = new FakeClock();
+    const seats: SeatInfo[] = BOT_SEATS.map((s) =>
+      s.slot === 0 ? { ...s, name: 'Human', isBot: false } : s,
+    );
+    const room = { ...fakeRoom(), seatInfo: () => seats };
+    const m = new Match(room, sandbox, { clock, seed: 8 });
+    room.match = m;
+    m.start();
+    clock.advance(PERIOD * (INTRO_TICKS + 60));
+    const positions = () => {
+      const snap = snapshots(room.sent).at(-1)!.state;
+      return snap.players.find((p) => p.slot === 0)!;
+    };
+    // A silent human stands still.
+    const before = { ...positions() };
+    clock.advance(PERIOD * 30);
+    expect(positions()).toEqual(before);
+    // They disconnect; a bot takes the seat and starts moving it.
+    seats[0] = { ...seats[0]!, connected: false };
+    clock.advance(PERIOD * 60);
+    const after = positions();
+    expect(Math.hypot(after.x - before.x, after.y - before.y)).toBeGreaterThan(1);
+    expect(room.phase).toBe('PLAYING');
+  });
+
+  it('goes back to the lobby on rematch and plays a fresh match', () => {
+    const { clock, room, a, b, mgr } = humanRoom(21);
+    const run = () => {
+      for (let i = 0; i < 1000 && room.phase !== 'PODIUM'; i++) clock.advance(PERIOD);
+      expect(room.phase).toBe('PODIUM');
+    };
+    run();
+    a.send({ type: 'rematch' });
+    expect(room.phase).toBe('LOBBY');
+    expect(room.seatInfo().filter((s) => s?.isBot)).toHaveLength(0);
+    a.send({ type: 'setReady', ready: true });
+    b.send({ type: 'setReady', ready: true });
+    a.send({ type: 'startMatch' });
+    expect(room.phase).toBe('INTRO');
+    run();
+    expect(a.socket.sent.filter((m) => m.type === 'matchResult')).toHaveLength(2);
+    mgr.close();
   });
 });
 

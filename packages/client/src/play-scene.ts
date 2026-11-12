@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { getMiniGame } from '@monkey-mania-2/shared';
 import type { NetGame } from './net/net-game';
 import { getRenderer, type RenderScene, type SpriteOpts } from './render';
+import { SLOT_COLORS } from './render/types';
 
 /** Draws the current round each frame through the renderer registry. */
 export class PlayScene extends Phaser.Scene implements RenderScene {
@@ -35,13 +36,36 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
     this.view = (miniGameId && getMiniGame(miniGameId)?.view) || 'top';
     this.drawBackground(phase, miniGameId, view?.players.find((p) => p.slot === this.net.slot)?.x);
     if (phase === 'INTRO' && intro) {
-      this.text(320, 160, intro.displayName, { size: 24 });
-      this.text(320, 196, intro.controlsHint);
+      this.text(320, 100, `Round ${intro.round} of ${intro.totalRounds}`, { size: 14 });
+      this.text(320, 150, intro.displayName, { size: 28 });
+      this.text(320, 196, intro.controlsHint, { size: 12 });
+      this.text(320, 250, String(Math.max(1, this.net.introCountdown())), { size: 40 });
+      if (intro.round === intro.totalRounds)
+        this.text(320, 290, 'Final round: double points!', { size: 14, color: '#ffd23f' });
     } else if (view && miniGameId && phase !== 'LOBBY' && phase !== null) {
       getRenderer(miniGameId)(view, this);
     }
+    if (phase === 'INTRO' || phase === 'PLAYING' || phase === 'RESULTS') this.scoreboard();
     for (let i = this.used; i < this.labels.length; i++) this.labels[i]?.setVisible(false);
     for (let i = this.usedSprites; i < this.sprites.length; i++) this.sprites[i]?.setVisible(false);
+  }
+
+  /** Compact party scores along the bottom edge, always visible during a round. */
+  private scoreboard(): void {
+    for (const seat of this.net.seats) {
+      if (!seat) continue;
+      const color = `#${SLOT_COLORS[seat.slot % SLOT_COLORS.length]!.toString(16).padStart(6, '0')}`;
+      const you = seat.slot === this.net.slot ? '>' : '';
+      this.text(
+        80 + seat.slot * 160,
+        350,
+        `${you}${seat.name.slice(0, 8)} ${this.net.totals[seat.slot] ?? 0}`,
+        {
+          color,
+          size: 10,
+        },
+      );
+    }
   }
 
   /** Title before a room, lobby art around matches, and the mini-game's own backdrop in a round. */

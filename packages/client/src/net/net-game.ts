@@ -1,9 +1,12 @@
 import {
   getMiniGame,
+  INTRO_SECONDS,
+  MAX_PLAYERS,
   NEUTRAL_INPUT,
   type BaseSnapshot,
   type PlayerInput,
   type RoomPhase,
+  type SeatInfo,
   type ServerMessage,
   type Slot,
 } from '@monkey-mania-2/shared';
@@ -32,6 +35,11 @@ export class NetGame {
   phase: RoomPhase | null = null;
   miniGameId: string | null = null;
   intro: RoundIntro | null = null;
+  /** Seats from the latest roomState, for names on the scoreboard. */
+  seats: (SeatInfo | null)[] = [];
+  /** Party points by slot, from the server's round and match results. */
+  totals: number[] = Array.from({ length: MAX_PLAYERS }, () => 0);
+  private introAt = 0;
   readonly buffer = new SnapshotBuffer();
   readonly predictor = new Predictor();
   private lastFrame: number | null = null;
@@ -45,7 +53,12 @@ export class NetGame {
     private readonly now: () => number = () => performance.now(),
   ) {
     conn.on('joined', (m) => (this.slot = m.slot));
-    conn.on('roomState', (m) => (this.phase = m.phase));
+    conn.on('roomState', (m) => {
+      this.phase = m.phase;
+      this.seats = m.seats;
+    });
+    conn.on('roundResult', (m) => this.setTotals(m.scores));
+    conn.on('matchResult', (m) => this.setTotals(m.totals));
     conn.on('status', (s) => {
       if (s === 'closed') this.reset(null);
     });
@@ -58,8 +71,19 @@ export class NetGame {
     return this.phase === 'INTRO' || this.phase === 'PLAYING';
   }
 
+  private setTotals(scores: { slot: Slot; total: number }[]): void {
+    for (const s of scores) this.totals[s.slot] = s.total;
+  }
+
+  /** Whole seconds left on the intro card's countdown (3, 2, 1), 0 once it is over. */
+  introCountdown(): number {
+    return Math.max(0, Math.ceil(INTRO_SECONDS - (this.now() - this.introAt) / 1000));
+  }
+
   private reset(intro: RoundIntro | null): void {
     this.intro = intro;
+    this.introAt = this.now();
+    if (!intro || intro.round === 1) this.totals = this.totals.map(() => 0);
     this.miniGameId = intro?.miniGameId ?? null;
     this.buffer.clear();
     this.predictor.clear();

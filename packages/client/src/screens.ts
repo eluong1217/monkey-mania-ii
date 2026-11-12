@@ -9,6 +9,10 @@ import {
 import { loadSaved, save, type Connection } from './connection';
 
 type RoomState = Extract<ServerMessage, { type: 'roomState' }>;
+type RoundResult = Extract<ServerMessage, { type: 'roundResult' }>;
+type MatchResult = Extract<ServerMessage, { type: 'matchResult' }>;
+
+const ORDINALS = ['1st', '2nd', '3rd', '4th'];
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -25,6 +29,8 @@ export class Screens {
   private slot: Slot | null = null;
   private room: RoomState | null = null;
   private error = '';
+  private roundResult: RoundResult | null = null;
+  private matchResult: MatchResult | null = null;
   private readonly inviteCode: string;
 
   constructor(
@@ -39,8 +45,21 @@ export class Screens {
       save('rejoinToken', m.rejoinToken);
       this.error = '';
     });
+    this.conn.on('roundResult', (m) => {
+      this.roundResult = m;
+      this.render();
+    });
+    this.conn.on('matchResult', (m) => {
+      this.matchResult = m;
+      this.render();
+    });
+    this.conn.on('roundIntro', (m) => {
+      if (m.round === 1) this.matchResult = null;
+      this.roundResult = null;
+    });
     this.conn.on('roomState', (m) => {
       this.room = m;
+      if (m.phase === 'LOBBY') this.roundResult = this.matchResult = null;
       history.replaceState(null, '', `/?room=${m.code}`);
       this.render();
     });
@@ -97,7 +116,11 @@ export class Screens {
       this.room
         ? this.conn.status === 'closed'
           ? this.disconnected()
-          : this.lobby(this.room)
+          : this.room.phase === 'RESULTS'
+            ? this.results(this.room)
+            : this.room.phase === 'PODIUM'
+              ? this.podium(this.room)
+              : this.lobby(this.room)
         : this.home(),
     );
     const focus = this.root.querySelector<HTMLElement>('[autofocus]');
@@ -227,8 +250,6 @@ export class Screens {
     actions.append(leave);
 
     ready.setAttribute('autofocus', '');
-    const status =
-      room.phase === 'LOBBY' ? '' : room.phase === 'RESULTS' ? 'Round over.' : 'Match over.';
     return el(
       'main',
       { className: 'screen' },
@@ -240,7 +261,76 @@ export class Screens {
           ? 'You are the host. Start when everyone is ready.'
           : 'Waiting for the host to start.',
       }),
-      el('p', { textContent: status }),
+      this.errorLine(),
+    );
+  }
+
+  private seatName(room: RoomState, slot: Slot): string {
+    const seat = room.seats[slot];
+    return `${seat?.name ?? `Player ${slot + 1}`}${slot === this.slot ? ' (you)' : ''}`;
+  }
+
+  /** One row per placement group: "1st  Name  +3  (total 7)". Ties share a place. */
+  private standingsList(
+    room: RoomState,
+    placements: Slot[][],
+    scores: { slot: Slot; points: number; total: number }[],
+    showPoints: boolean,
+  ): HTMLElement {
+    const list = el('ol', { className: 'seats standings' });
+    let place = 0;
+    for (const group of placements) {
+      for (const slot of group) {
+        const s = scores.find((x) => x.slot === slot);
+        const gain = showPoints && s ? `  +${s.points}` : '';
+        list.append(
+          el('li', {
+            className: place === 0 ? 'ready' : '',
+            textContent: `${ORDINALS[place] ?? `${place + 1}th`}  ${this.seatName(room, slot)}${gain}  —  ${s?.total ?? 0} pts`,
+          }),
+        );
+      }
+      place += group.length;
+    }
+    return list;
+  }
+
+  private results(room: RoomState): HTMLElement {
+    const r = this.roundResult;
+    const body = r
+      ? this.standingsList(room, r.placements, r.scores, true)
+      : el('p', { textContent: 'Round over.' });
+    return el(
+      'main',
+      { className: 'screen' },
+      el('h1', { textContent: r ? `Round ${r.round} results` : 'Round over' }),
+      body,
+      el('p', { textContent: 'Next round starting…' }),
+    );
+  }
+
+  private podium(room: RoomState): HTMLElement {
+    const m = this.matchResult;
+    const rematch = el('button', { type: 'button', textContent: 'Rematch' });
+    rematch.onclick = () => this.conn.send({ type: 'rematch' });
+    rematch.setAttribute('autofocus', '');
+    const leave = el('button', { type: 'button', textContent: 'Leave' });
+    leave.onclick = () => this.leave();
+    const winners = m?.placements[0] ?? [];
+    return el(
+      'main',
+      { className: 'screen' },
+      el('h1', { textContent: 'Podium' }),
+      m
+        ? el('p', {
+            textContent:
+              winners.length > 1
+                ? `Tie: ${winners.map((s) => this.seatName(room, s)).join(' and ')}!`
+                : `${winners[0] === undefined ? '' : this.seatName(room, winners[0])} wins!`,
+          })
+        : el('p', { textContent: 'The match ended early.' }),
+      m ? this.standingsList(room, m.placements, m.totals, false) : el('span'),
+      el('div', { className: 'row' }, rematch, leave),
       this.errorLine(),
     );
   }

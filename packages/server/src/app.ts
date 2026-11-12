@@ -24,7 +24,7 @@ export interface AppOptions {
 /** HTTP server that serves the built client, /healthz, and a WebSocket endpoint at /ws. */
 export function createApp(clientDir: string, options: AppOptions = {}): Server {
   const rooms = new RoomManager({
-    hooks: options.hooks ?? { onMatchStart: (room) => startMatch(room, 'sandbox') },
+    hooks: options.hooks ?? { onMatchStart: (room) => startMatch(room) },
     emptyTimeoutMs: options.emptyTimeoutMs,
   });
   const server = createServer((req, res) => {
