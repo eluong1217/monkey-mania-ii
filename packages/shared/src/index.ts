@@ -30,3 +30,11 @@ export {
   type BananaHeistSnapshot,
   type HeistView,
 } from './minigames/banana-heist/index.js';
+export {
+  kingOfTheStump,
+  platformRadius,
+  PLATFORM_X,
+  PLATFORM_Y,
+  type KingOfTheStumpState,
+  type KingOfTheStumpSnapshot,
+} from './minigames/king-of-the-stump/index.js';
