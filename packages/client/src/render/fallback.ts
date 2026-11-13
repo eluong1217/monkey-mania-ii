@@ -3,10 +3,6 @@ import { manifest } from '../assets/manifest';
 import { MonkeyAnimator, type MonkeyHints } from './monkey';
 import type { RenderScene } from './types';
 
-export function drawTimer(snapshot: BaseSnapshot, scene: RenderScene): void {
-  if (snapshot.timeLeft !== undefined) scene.text(320, 12, String(Math.ceil(snapshot.timeLeft)));
-}
-
 const animator = new MonkeyAnimator();
 
 /** Players as animated monkeys; the local one gets a white ring. */
@@ -16,7 +12,10 @@ export function drawPlayers(
   hints?: (index: number, slot: Slot) => MonkeyHints,
 ): void {
   for (const [i, p] of snapshot.players.entries()) {
-    if (p.slot === scene.localSlot) scene.ring(p.x, p.y + 30, p.r + 2, 0xffffff, 2); // at the feet, under the monkey
+    if (p.slot === scene.localSlot) {
+      scene.ring(p.x, p.y + 30, p.r + 2, 0xffffff, 2); // at the feet, under the monkey
+      scene.text(p.x, p.y - 50, 'YOU', { color: '#ffd23f', size: 10 });
+    }
     animator.draw(scene, p, snapshot.tick, scene.view, hints?.(i, p.slot));
   }
 }
@@ -56,7 +55,6 @@ export function fallbackRenderer(snapshot: BaseSnapshot, scene: RenderScene): vo
     if (e.r >= 4) scene.text(e.x, e.y, e.kind.charAt(0).toUpperCase(), { color: '#333', size: 8 });
   }
   drawPlayers(snapshot, scene);
-  drawTimer(snapshot, scene);
 }
 
 /** True for a few ticks after an ability fires, judged from its ready-at tick and cooldown. */

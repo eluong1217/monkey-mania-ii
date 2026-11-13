@@ -6,6 +6,7 @@ const ASSETS_DIR = resolve(import.meta.dirname, '../../assets');
 const TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.ogg': 'audio/ogg',
+  '.woff2': 'font/woff2',
   '.mp3': 'audio/mpeg',
   '.json': 'application/json',
 };

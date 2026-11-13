@@ -1,6 +1,6 @@
 import { bananaHeist, type BaseSnapshot, type BananaHeistSnapshot } from '@monkey-mania-2/shared';
 import { monkeyColor } from '../assets/manifest';
-import { drawPlayers, drawTimer, justActed } from './fallback';
+import { drawPlayers, justActed } from './fallback';
 import type { RenderScene } from './types';
 
 /** Banana Heist: corner stashes with counts, bananas, coconuts, carried count above each monkey. */
@@ -37,7 +37,5 @@ export function bananaHeistRenderer(snapshot: BaseSnapshot, scene: RenderScene):
           2,
         );
     }
-    scene.text(80 + i * 160, 30, `P${p.slot + 1}: ${s.stash?.[i] ?? 0}`, { size: 12 });
   });
-  drawTimer(s, scene);
 }

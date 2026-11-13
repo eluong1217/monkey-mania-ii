@@ -1,5 +1,5 @@
 import { coconutDodge, type BaseSnapshot, type CoconutDodgeSnapshot } from '@monkey-mania-2/shared';
-import { drawPlayers, drawTimer, justActed } from './fallback';
+import { drawPlayers, justActed } from './fallback';
 import type { RenderScene } from './types';
 
 const FALL_PX_PER_TICK = 8;
@@ -38,10 +38,4 @@ export function coconutDodgeRenderer(snapshot: BaseSnapshot, scene: RenderScene)
   const mine = me >= 0 ? s.players[me] : undefined;
   if (mine && s.alive?.[me] && (s.rollReadyAt?.[me] ?? 0) <= s.tick)
     scene.ring(mine.x, mine.y + 30, mine.r + 8, 0xffffff, 1);
-  s.players.forEach((p, i) =>
-    scene.text(80 + i * 160, 30, `P${p.slot + 1}${s.alive?.[i] === false ? ' OUT' : ''}`, {
-      size: 12,
-    }),
-  );
-  drawTimer(s, scene);
 }

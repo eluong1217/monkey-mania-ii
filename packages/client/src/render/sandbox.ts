@@ -1,5 +1,5 @@
 import type { BaseSnapshot, SandboxSnapshot } from '@monkey-mania-2/shared';
-import { drawPlayers, drawTimer } from './fallback';
+import { drawPlayers } from './fallback';
 import type { RenderScene } from './types';
 
 /** Sandbox: coloured circles with slot labels; a faint halo shows when your push is ready. */
@@ -10,5 +10,4 @@ export function sandboxRenderer(snapshot: BaseSnapshot, scene: RenderScene): voi
   if (me && readyAt !== undefined && s.tick >= readyAt)
     scene.circle(me.x, me.y, me.r + 6, 0xffffff, 0.2);
   drawPlayers(s, scene);
-  drawTimer(s, scene);
 }

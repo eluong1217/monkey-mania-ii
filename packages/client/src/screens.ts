@@ -7,10 +7,30 @@ import {
   type Slot,
 } from '@monkey-mania-2/shared';
 import { loadSaved, save, type Connection } from './connection';
+import { ASSET_BASE, monkeyColor } from './assets/manifest';
 
 type RoomState = Extract<ServerMessage, { type: 'roomState' }>;
 type RoundResult = Extract<ServerMessage, { type: 'roundResult' }>;
 type MatchResult = Extract<ServerMessage, { type: 'matchResult' }>;
+
+const pts = (n: number): string => `${n} ${n === 1 ? 'pt' : 'pts'}`;
+
+const reducedMotion = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** A short fade to black and back, used when the menus and the canvas swap places. */
+function pulseFade(): void {
+  const fade = document.getElementById('fade');
+  if (!fade || reducedMotion()) return;
+  fade.classList.add('on');
+  setTimeout(() => fade.classList.remove('on'), 200);
+}
+
+function badge(slot: Slot): HTMLImageElement {
+  return el('img', {
+    src: `${ASSET_BASE}ui/seat_badge_${monkeyColor(slot)}.png`,
+    alt: `P${slot + 1}`,
+  });
+}
 
 const ORDINALS = ['1st', '2nd', '3rd', '4th'];
 
@@ -107,6 +127,7 @@ export class Screens {
     const playing =
       this.conn.status === 'open' &&
       (this.room?.phase === 'INTRO' || this.room?.phase === 'PLAYING');
+    if (playing !== this.root.hidden) pulseFade();
     this.root.hidden = playing;
     if (playing) {
       (document.activeElement as HTMLElement | null)?.blur();
@@ -205,19 +226,26 @@ export class Screens {
     const isHost = me === room.host;
     const seats = el('ul', { className: 'seats' });
     room.seats.forEach((seat, i) => {
-      const text = !seat
+      const status = !seat
+        ? ''
+        : seat.isBot
+          ? '✔ READY'
+          : !seat.connected
+            ? '✖ AWAY'
+            : seat.ready
+              ? '✔ READY'
+              : '… waiting';
+      const label = !seat
         ? 'Empty (a bot will fill in)'
-        : `${seat.name}${seat.isBot ? ' (bot)' : ''}${i === room.host ? ' ★ host' : ''}${i === me ? ' (you)' : ''} — ${
-            seat.isBot
-              ? 'ready'
-              : !seat.connected
-                ? 'disconnected'
-                : seat.ready
-                  ? 'READY'
-                  : 'not ready'
-          }`;
+        : `${seat.name}${seat.isBot ? ' (bot)' : ''}${i === room.host ? ' ★' : ''}${i === me ? ' (you)' : ''}`;
       seats.append(
-        el('li', { className: seat?.ready ? 'ready' : '', textContent: `${i + 1}. ${text}` }),
+        el(
+          'li',
+          { className: `${seat?.ready || seat?.isBot ? 'ready' : ''}${i === me ? ' me' : ''}` },
+          badge(i),
+          el('span', { className: 'grow', textContent: label }),
+          el('span', { textContent: status }),
+        ),
       );
     });
 
@@ -282,17 +310,36 @@ export class Screens {
     for (const group of placements) {
       for (const slot of group) {
         const s = scores.find((x) => x.slot === slot);
-        const gain = showPoints && s ? `  +${s.points}` : '';
-        list.append(
-          el('li', {
-            className: place === 0 ? 'ready' : '',
-            textContent: `${ORDINALS[place] ?? `${place + 1}th`}  ${this.seatName(room, slot)}${gain}  —  ${s?.total ?? 0} pts`,
-          }),
+        const total = el('span', { textContent: pts(s?.total ?? 0) });
+        const row = el(
+          'li',
+          { className: `${place === 0 ? 'ready' : ''}${slot === this.slot ? ' me' : ''}` },
+          el('span', { className: 'place', textContent: ORDINALS[place] ?? `${place + 1}th` }),
+          badge(slot),
+          el('span', { className: 'grow', textContent: this.seatName(room, slot) }),
         );
+        if (showPoints && s && s.points > 0) {
+          row.append(el('span', { className: 'gain', textContent: `+${s.points}` }));
+          this.countUp(total, s.total - s.points, s.total);
+        }
+        row.append(total);
+        list.append(row);
       }
       place += group.length;
     }
     return list;
+  }
+
+  /** Counts a total up to its new value so the point gain is visible. */
+  private countUp(node: HTMLElement, from: number, to: number): void {
+    if (reducedMotion()) return;
+    let v = from;
+    node.textContent = pts(v);
+    const timer = setInterval(() => {
+      v++;
+      node.textContent = pts(v);
+      if (v >= to || !node.isConnected) clearInterval(timer);
+    }, 350);
   }
 
   private results(room: RoomState): HTMLElement {
@@ -320,6 +367,7 @@ export class Screens {
     return el(
       'main',
       { className: 'screen' },
+      m ? el('img', { className: 'crown', src: `${ASSET_BASE}ui/crown.png`, alt: '' }) : el('span'),
       el('h1', { textContent: 'Podium' }),
       m
         ? el('p', {

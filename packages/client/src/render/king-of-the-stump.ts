@@ -3,7 +3,7 @@ import {
   type BaseSnapshot,
   type KingOfTheStumpSnapshot,
 } from '@monkey-mania-2/shared';
-import { drawPlayers, drawTimer, justActed } from './fallback';
+import { drawPlayers, justActed } from './fallback';
 import type { RenderScene } from './types';
 
 const CX = 320;
@@ -37,10 +37,4 @@ export function kingOfTheStumpRenderer(snapshot: BaseSnapshot, scene: RenderScen
         },
       );
   });
-  s.players.forEach((p, i) =>
-    scene.text(80 + i * 160, 30, `P${p.slot + 1}${s.alive?.[i] === false ? ' OUT' : ''}`, {
-      size: 12,
-    }),
-  );
-  drawTimer(s, scene);
 }

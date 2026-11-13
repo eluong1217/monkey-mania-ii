@@ -41,7 +41,7 @@ describe('renderer registry', () => {
     expect(calls).toContain('sprite monkey_green_top:0 50,92');
     expect(calls).toContain('text W');
     expect(calls).toContain('ring 50,90');
-    expect(calls).toContain('text 10');
+    expect(calls).toContain('text YOU');
   });
 
   it('fallback draws entities that have art as sprites', () => {

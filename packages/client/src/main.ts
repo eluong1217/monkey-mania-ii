@@ -19,18 +19,27 @@ keyboard.attach(window);
 const net = new NetGame(conn, () => keyboard.sample());
 conn.on('roomState', () => (keyboard.capturing = net.inRound));
 
-const game = new Phaser.Game({
-  type: Phaser.AUTO,
-  parent: 'game',
-  width: LOGICAL_SIZE.width,
-  height: LOGICAL_SIZE.height,
-  backgroundColor: '#1d7a4a',
-  // The art is pre-rendered low-poly, not pixel art: keep smooth filtering.
-  pixelArt: false,
-  antialias: true,
-  roundPixels: false,
-  scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [new PreloadScene(), new PlayScene(net)],
+/** Text on the canvas is rendered once, so the menu font must be ready before the first frame. */
+const fontReady = document.fonts
+  ? document.fonts.load('16px "Lilita One"').catch(() => undefined)
+  : Promise.resolve();
+
+let game: Phaser.Game;
+void fontReady.then(() => {
+  game = new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: 'game',
+    width: LOGICAL_SIZE.width,
+    height: LOGICAL_SIZE.height,
+    backgroundColor: '#1d7a4a',
+    // The art is pre-rendered low-poly, not pixel art: keep smooth filtering.
+    pixelArt: false,
+    antialias: true,
+    roundPixels: false,
+    scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.CENTER_BOTH },
+    scene: [new PreloadScene(), new PlayScene(net)],
+  });
+  fit();
 });
 
 /** Integer-scale the 640x360 canvas to the largest whole multiple that fits the window. */
@@ -39,9 +48,8 @@ function fit(): void {
     1,
     Math.floor(Math.min(innerWidth / LOGICAL_SIZE.width, innerHeight / LOGICAL_SIZE.height)),
   );
-  game.scale.setZoom(zoom);
+  game?.scale.setZoom(zoom);
 }
-fit();
 addEventListener('resize', fit);
 
 const ui = document.getElementById('ui');

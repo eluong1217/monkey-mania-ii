@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monkey Mania II</title>
     <style>
+      @font-face {
+        font-family: 'Lilita One';
+        src: url('/assets/fonts/lilita-one.woff2') format('woff2');
+        font-display: block;
+      }
+      :root {
+        --ink: #2b1a00;
+        --gold: #ffd23f;
+        --panel: #fff6dc;
+      }
       html,
       body {
         margin: 0;
@@ -22,27 +32,61 @@
         display: grid;
         place-items: center;
         font:
-          20px/1.4 system-ui,
+          22px/1.35 'Lilita One',
+          system-ui,
           sans-serif;
+        letter-spacing: 0.02em;
         color: #fff;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(10, 20, 10, 0.55);
       }
       .screen {
-        width: min(480px, 92vw);
+        width: min(520px, 92vw);
+        box-sizing: border-box;
+        padding: 36px 40px;
+        border: 40px solid transparent;
+        border-image: url('/assets/ui/panel_frame.png') 60 fill / 40px stretch;
+        border-image-repeat: stretch;
+        animation: fade-in 0.25s ease-out;
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .screen {
+          animation: none;
+        }
       }
       .screen h1 {
         text-align: center;
+        margin: 0 0 12px;
+        font-weight: normal;
+        font-size: 40px;
+        color: var(--gold);
+        text-shadow:
+          0 3px 0 #5a3b00,
+          0 0 8px #000;
+      }
+      .screen p {
+        margin: 8px 0;
+        text-shadow: 0 2px 0 #000;
       }
       .screen label {
         display: block;
         margin-top: 12px;
+        text-shadow: 0 2px 0 #000;
       }
       .screen input {
         width: 100%;
         box-sizing: border-box;
         font: inherit;
-        padding: 8px;
-        text-transform: none;
+        padding: 8px 12px;
+        color: var(--ink);
+        background: var(--panel);
+        border: 3px solid #5a3b00;
+        border-radius: 10px;
       }
       .row {
         display: flex;
@@ -52,36 +96,107 @@
       }
       button {
         font: inherit;
-        padding: 8px 16px;
+        min-height: 52px;
+        padding: 2px 10px;
         cursor: pointer;
-        background: #ffd23f;
-        border: 3px solid #5a3b00;
-        border-radius: 6px;
+        color: #fff;
+        text-shadow: 0 2px 0 #0a2a5a;
+        background: none;
+        border: 14px solid transparent;
+        border-image: url('/assets/ui/button_normal.png') 20 fill / 14px stretch;
+        margin: -4px -6px;
       }
-      button:focus-visible,
+      button:hover,
+      button:focus-visible {
+        border-image-source: url('/assets/ui/button_focused.png');
+        color: #fff;
+        outline: none;
+        transform: scale(1.06);
+      }
+      /* Focus is shown by the glowing frame AND a pointer, so it never relies on colour alone. */
+      button:focus-visible::before {
+        content: '\25B6\00a0';
+        color: var(--gold);
+      }
+      button:active {
+        border-image-source: url('/assets/ui/button_pressed.png');
+        transform: scale(0.97);
+      }
       input:focus-visible {
-        outline: 4px solid #fff;
+        outline: 4px solid var(--gold);
         outline-offset: 2px;
         box-shadow: 0 0 0 7px #e8590c;
       }
       .seats {
         list-style: none;
         padding: 0;
+        margin: 8px 0;
       }
       .seats li {
-        padding: 6px 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 10px;
         margin: 4px 0;
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(0, 0, 0, 0.45);
+        border-radius: 10px;
       }
       .seats li.ready {
-        background: rgba(60, 200, 90, 0.4);
+        background: rgba(40, 150, 70, 0.6);
+      }
+      .seats li.me {
+        outline: 3px solid var(--gold);
+      }
+      .seats img {
+        width: 36px;
+        height: 36px;
+        image-rendering: auto;
+      }
+      .seats .grow {
+        flex: 1;
+      }
+      .seats .place {
+        min-width: 2.2em;
+        color: var(--gold);
+      }
+      .gain {
+        color: #9dff9d;
+        animation: pop 0.5s ease-out;
+      }
+      @keyframes pop {
+        from {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .gain {
+          animation: none;
+        }
       }
       .error {
-        color: #ffb3a7;
+        color: #ffd0c7;
         min-height: 1.4em;
+      }
+      .crown {
+        display: block;
+        margin: 0 auto;
+        width: 64px;
+        height: 64px;
       }
       [hidden] {
         display: none !important;
+      }
+      #fade {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      #fade.on {
+        opacity: 1;
       }
       #debug {
         position: fixed;
@@ -99,6 +214,7 @@
   <body>
     <div id="game"></div>
     <div id="ui"></div>
+    <div id="fade"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -94,3 +94,7 @@ Frame order for monkeys: idle, run 1, run 2, shove/throw, stunned, out, win. Sid
 | `music_results` | `audio/music_results.ogg` | music loop |
 
 Record the source and licence of every audio file in `audio/CREDITS.md`.
+
+## Fonts
+
+`fonts/lilita-one.woff2` is **Lilita One** (Juan Montoreano), the bold rounded menu and HUD font. Licence: SIL Open Font Licence 1.1, full text in `fonts/OFL.txt`. Obtained from the Fontsource `@fontsource/lilita-one` 5.3.0 package (Latin subset). It is loaded by `@font-face` in `packages/client/index.html` and awaited before the game starts.
