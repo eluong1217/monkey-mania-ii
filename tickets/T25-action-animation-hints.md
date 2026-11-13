@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T16, T10, T11, T12, T13
-- **Status:** todo
+- **Status:** review
 
 ## Goal
 Each mini-game's special move and eliminations show on the monkeys. T16's `MonkeyAnimator` already has `action`, `stunned` and `out` poses, but `drawPlayers` never passes `MonkeyHints`, so only idle and run play.
@@ -26,3 +26,9 @@ Each mini-game's special move and eliminations show on the monkeys. T16's `Monke
 Sim changes, new art, sound (T17).
 
 ## Handoff
+
+**Built:** Most of the ticket was already in the tree: `drawPlayers` takes a hints lookup, a `justActed` helper derives `acted` from `*ReadyAt` and the tuning cooldown, and the Coconut Dodge, Fruit Frenzy and Banana Heist renderers already pass `acted`/`stunned`/`out` (Coconut Dodge also uses the `coconut_shadow_target` sprite and has no red X). The missing piece was King of the Stump, which dropped fallen players instead of drawing them. It now draws every player and passes `out` for `alive[i] === false`.
+
+**Verified:** `npm test` (186 pass) and `npm run build` pass. I did not look at the poses in a browser, so the "shows the matching pose" item needs a quick manual check.
+
+**Notes:** No snapshot fields were missing. `acted` is inferred from the ready-at tick, so it fires for about 4 ticks after each action and depends on the tuning cooldown matching the sim.

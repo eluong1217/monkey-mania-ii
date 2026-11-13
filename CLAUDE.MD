@@ -13,6 +13,16 @@ A 4-player online party game for the browser. `docs/DESIGN.md` is the design con
 
 If the ticket names a different model from the one running, mention it once and carry on.
 
+## When asked to add or change a ticket
+
+1. Read `docs/DESIGN.md`, `tickets/README.md` and any tickets the new work touches.
+2. Use the next unused ticket number; never reuse or renumber existing ones.
+3. Write the ticket in the same format as the others: Assignee, Depends on, Status, Goal, Scope, Done when, Out of scope, Handoff. Size it for one session.
+4. Choose the assignee by difficulty: Opus for shared contracts and netcode, Sonnet for features, Haiku for small chores.
+5. Add its row to `tickets/README.md` and update the "Depends on" of any ticket that now relies on it.
+6. If the change alters the game's rules, art direction or architecture, update `docs/DESIGN.md` in the same change.
+7. Do not write any code. Show the new or changed ticket text and stop.
+
 ## Conventions
 
 - Favour the simplest implementation that satisfies the ticket.

@@ -10,19 +10,16 @@ const CX = 320;
 const CY = 180;
 const ART = 256; // tree_stump_platform is a full-bleed disc
 
-/** King of the Stump: the shrinking stump sprite, survivors as monkeys, shove squash. */
+/** King of the Stump: the shrinking stump sprite, monkeys (fallen ones in the out pose), shove squash. */
 export function kingOfTheStumpRenderer(snapshot: BaseSnapshot, scene: RenderScene): void {
   const s = snapshot as KingOfTheStumpSnapshot;
   const k = (s.platformR * 2) / ART;
   scene.sprite('tree_stump_platform', 0, CX, CY, { depth: -10, scaleX: k, scaleY: k });
 
-  const alive = s.players.filter((_, i) => s.alive?.[i] !== false);
-  drawPlayers({ ...s, players: alive }, scene, (_, slot) => {
-    const i = s.players.findIndex((p) => p.slot === slot);
-    return {
-      acted: justActed(s.shoveReadyAt?.[i], s.tick, kingOfTheStump.tuning.shoveCooldownSeconds),
-    };
-  });
+  drawPlayers(s, scene, (i) => ({
+    out: s.alive?.[i] === false,
+    acted: justActed(s.shoveReadyAt?.[i], s.tick, kingOfTheStump.tuning.shoveCooldownSeconds),
+  }));
   s.players.forEach((p, i) => {
     if (s.alive?.[i] === false) return;
     if (s.tick - (s.shovedAt?.[i] ?? -99) < 6)
