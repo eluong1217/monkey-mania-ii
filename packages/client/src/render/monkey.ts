@@ -24,6 +24,7 @@ interface Motion {
   /** performance-clock ms at which the last action squash began. */
   squashAt: number;
   moving: boolean;
+  acting: boolean;
 }
 
 const RUN_FRAME_MS = 125;
@@ -51,7 +52,7 @@ export class MonkeyAnimator {
     let m = this.motion.get(p.slot);
     // A new round restarts the tick counter; forget the old position so nothing slides in.
     if (!m || tick < m.tick) {
-      m = { x: p.x, y: p.y, tick, facing: 1, squashAt: -Infinity, moving: false };
+      m = { x: p.x, y: p.y, tick, facing: 1, squashAt: -Infinity, moving: false, acting: false };
       this.motion.set(p.slot, m);
     }
     const dx = p.x - m.x;
@@ -63,7 +64,8 @@ export class MonkeyAnimator {
       m.y = p.y;
       m.tick = tick;
     }
-    if (hints.acted) m.squashAt = t;
+    if (hints.acted && !m.acting) m.squashAt = t; // squash once per action, not every frame
+    m.acting = hints.acted === true;
 
     const pose: Pose = hints.out
       ? 'out'

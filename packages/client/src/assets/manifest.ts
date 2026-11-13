@@ -41,6 +41,10 @@ export const ASSET_BASE = '/assets/';
 /** Sprite-sheet key for a monkey: variants follow slot order red, blue, yellow, green. */
 export const MONKEY_COLORS = ['red', 'blue', 'yellow', 'green'] as const;
 
+export function monkeyColor(slot: number): string {
+  return MONKEY_COLORS[slot % MONKEY_COLORS.length]!;
+}
+
 export function monkeyKey(slot: number, view: 'top' | 'side' = 'top'): string {
   return `monkey_${MONKEY_COLORS[slot % MONKEY_COLORS.length]}_${view}`;
 }

@@ -1,27 +1,30 @@
-import type { BaseSnapshot, BananaHeistSnapshot } from '@monkey-mania-2/shared';
-import { drawPlayers, drawTimer } from './fallback';
-import { slotColor, type RenderScene } from './types';
+import { bananaHeist, type BaseSnapshot, type BananaHeistSnapshot } from '@monkey-mania-2/shared';
+import { monkeyColor } from '../assets/manifest';
+import { drawPlayers, drawTimer, justActed } from './fallback';
+import type { RenderScene } from './types';
 
 /** Banana Heist: corner stashes with counts, bananas, coconuts, carried count above each monkey. */
 export function bananaHeistRenderer(snapshot: BaseSnapshot, scene: RenderScene): void {
   const s = snapshot as BananaHeistSnapshot;
   for (const e of s.entities ?? []) {
     if (e.kind === 'stash') {
-      scene.circle(e.x, e.y, e.r, slotColor(e.owner), 0.35);
-      scene.ring(e.x, e.y, e.r, slotColor(e.owner), 2);
-      scene.text(e.x, e.y, String(e.count), { size: 16 });
+      scene.sprite(`stash_${monkeyColor(e.owner)}`, 0, e.x, e.y, { depth: -5 });
+      scene.text(e.x, e.y + 24, String(e.count), { size: 14 });
     } else if (e.kind === 'banana') {
-      scene.circle(e.x, e.y, e.r, 0xffe135);
+      scene.sprite('banana', 0, e.x, e.y);
     } else {
-      scene.circle(e.x, e.y, e.r, 0x6b3e1f);
+      scene.sprite('coconut', 0, e.x, e.y);
     }
   }
-  drawPlayers(s, scene);
+  drawPlayers(s, scene, (i) => ({
+    stunned: (s.stunnedUntil?.[i] ?? 0) > s.tick,
+    acted: justActed(s.throwReadyAt?.[i], s.tick, bananaHeist.tuning.throwCooldownSeconds),
+  }));
   s.players.forEach((p, i) => {
     const carried = s.carried?.[i] ?? 0;
-    const stunned = (s.stunnedUntil?.[i] ?? 0) > s.tick;
     if (carried > 0) scene.text(p.x, p.y - 36, `x${carried}`, { color: '#ffe135', size: 10 });
-    if (stunned) scene.text(p.x, p.y - 46, 'STUN', { color: '#ff3b30', size: 10 });
+    if ((s.stunnedUntil?.[i] ?? 0) > s.tick)
+      scene.sprite('stun_stars', 0, p.x, p.y - 28, { depth: p.y + 1 });
     if ((s.stealTicks?.[i] ?? 0) > 0) {
       const target = s.stealFrom?.[i] ?? -1;
       const stash = s.entities.find((e) => e.kind === 'stash' && e.owner === target);

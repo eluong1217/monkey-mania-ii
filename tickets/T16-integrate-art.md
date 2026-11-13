@@ -36,12 +36,30 @@ Particles, screen shake, sound (T17); HUD styling (T18).
 - Seat colours: `SLOT_COLORS` now match the monkey sheets (red, blue, yellow, green), so placeholders and UI agree with the art.
 - Art check: every image and sheet's pixel size matches the manifest (no mismatches to report). Only the 29 audio files are missing (A05).
 
-**Verified**: `npm test` and `npm run build` pass. Run in a browser: lobby and sandbox checked by eye (screenshots below); depth sorting, ring at the feet and smooth filtering confirmed. NOT verified: frame rate, mini-game scenes, podium.
+**Update (mini-games wired, after T10-T13)**
+- `fruit-frenzy`: fruit sprites (existing), monkeys get `stunned` (rotten fruit) and `acted` (shove) hints.
+- `coconut-dodge`: `coconut_shadow_target` sprites fade in as they near landing, a `coconut` sprite drops onto each in the last 12 ticks (depth 5000, over monkeys), `splat` on impact, eliminated monkeys use the `out` pose, local roll-ready ring at the feet.
+- `banana-heist`: `stash_<colour>` per owner (new `monkeyColor(slot)` in `assets/manifest.ts`), `banana` and `coconut` sprites, `stun_stars` over stunned monkeys, carried count kept as text.
+- `king-of-the-stump`: `tree_stump_platform` scaled to `platformR` (assumes the art is a full-bleed disc: check by eye), `dust_puff` at the shove, survivors only.
+- `drawPlayers` takes an optional per-player hints callback; `justActed(readyAt, tick, cooldown)` derives "just fired" from the snapshot's cooldown field. `MonkeyAnimator` squashes once per action (rising edge), not every frame.
+- `play-scene.ts`: mini-game renderers now run only in `PLAYING` and `RESULTS`, so they no longer draw over the intro card or the lobby.
+- Full-match run: see Verified below.
+
+**Verified**: `npm test` and `npm run build` pass. `node scripts/t16-capture.mjs <url>` plays a full 5-round match against bots in headless Chromium (Playwright is not a project dependency until T22: run `npm i --no-save playwright && npx playwright install chromium` first). It cycled through all four mini-games, reached the podium, had no disconnect, and logged no missing art files (4xx under `/assets/`; the audio decode errors are the A05 placeholders). Frame rate (second run, after the splat repair) over 212 one-second samples: median 60, p5 51, min 41; the first run gave median 60, p5 59, min 43. The dips are worth a look on real hardware. This is headless Chromium on a dev machine, not a mid-range laptop, so confirm on real hardware.
 
 **Screenshots**
 - Lobby: ![Lobby](T16-screenshots/lobby.png)
-- Sandbox (four monkeys, local ring, y-sorting): ![Sandbox](T16-screenshots/sandbox.png)
-- The pale disc behind the red monkey is the sandbox's "push ready" halo (`render/sandbox.ts`), not a sprite defect.
+- Sandbox: ![Sandbox](T16-screenshots/sandbox.png)
+- Fruit Frenzy: ![](T16-screenshots/fruit-frenzy.png)
+- King of the Stump: ![](T16-screenshots/king-of-the-stump.png)
+- Banana Heist: ![](T16-screenshots/banana-heist.png)
+- Coconut Dodge: ![](T16-screenshots/coconut-dodge.png)
+- Podium: ![](T16-screenshots/podium.png)
+
+**Defects seen in the screenshots**
+- Coconut Dodge: the `splat` sprite was cut off in a hard vertical line on its right edge (the art file itself was clipped, and no source sheet for it is in `assets/_source/`). Repaired in place: `assets/sprites/props/splat.png` is the same art scaled to about 89% with the three cut lobes closed by rounded caps, still 64×64, right edge column now fully transparent. Verified in a second full-match run (`coconut-dodge.png` shows it). A proper re-export from the art owner would still be better.
+- Coconut Dodge: shadow targets and splats also land on the palm border outside the sand (visible top-right and left in `coconut-dodge.png`). The arena covers the whole 640x360 canvas but the backdrop's playable sand is smaller. Either the backdrop or the arena bounds need aligning (design call, not fixed here).
+- Scoreboard labels along the bottom edge are hard to read (left for T18, out of scope here).
 
 **Not met / for later**
 - T10-T13 are not built, so there are no mini-game states to wire. Mini-game renderers (`render/<id>.ts`) should call `MonkeyAnimator` with hints and draw their own entities (stashes by owner colour, platform scaling, the coconut shadow target). Coconuts and rotten fruit art exist in the manifest.

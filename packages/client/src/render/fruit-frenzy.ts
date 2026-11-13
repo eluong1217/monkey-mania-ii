@@ -1,5 +1,5 @@
-import type { BaseSnapshot, FruitFrenzySnapshot } from '@monkey-mania-2/shared';
-import { drawPlayers, drawTimer, entityImage } from './fallback';
+import { fruitFrenzy, type BaseSnapshot, type FruitFrenzySnapshot } from '@monkey-mania-2/shared';
+import { drawPlayers, drawTimer, entityImage, justActed } from './fallback';
 import type { RenderScene } from './types';
 
 const COLORS: Record<string, number> = {
@@ -24,7 +24,10 @@ export function fruitFrenzyRenderer(snapshot: BaseSnapshot, scene: RenderScene):
   const readyAt = scene.localSlot === null ? undefined : s.shoveReadyAt?.[scene.localSlot];
   if (me && readyAt !== undefined && s.tick >= readyAt)
     scene.circle(me.x, me.y + 30, me.r + 6, 0xffffff, 0.2);
-  drawPlayers(s, scene);
+  drawPlayers(s, scene, (i) => ({
+    stunned: (s.stunnedUntil?.[i] ?? 0) > s.tick,
+    acted: justActed(s.shoveReadyAt?.[i], s.tick, fruitFrenzy.tuning.shoveCooldownSeconds),
+  }));
   s.players.forEach((p, i) =>
     scene.text(80 + i * 160, 30, `P${p.slot + 1}: ${s.scores?.[i] ?? 0}`, { size: 12 }),
   );

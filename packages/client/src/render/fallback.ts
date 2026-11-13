@@ -1,6 +1,6 @@
-import type { BaseSnapshot } from '@monkey-mania-2/shared';
+import { secondsToTicks, type BaseSnapshot, type Slot } from '@monkey-mania-2/shared';
 import { manifest } from '../assets/manifest';
-import { MonkeyAnimator } from './monkey';
+import { MonkeyAnimator, type MonkeyHints } from './monkey';
 import type { RenderScene } from './types';
 
 export function drawTimer(snapshot: BaseSnapshot, scene: RenderScene): void {
@@ -10,10 +10,14 @@ export function drawTimer(snapshot: BaseSnapshot, scene: RenderScene): void {
 const animator = new MonkeyAnimator();
 
 /** Players as animated monkeys; the local one gets a white ring. */
-export function drawPlayers(snapshot: BaseSnapshot, scene: RenderScene): void {
-  for (const p of snapshot.players) {
+export function drawPlayers(
+  snapshot: BaseSnapshot,
+  scene: RenderScene,
+  hints?: (index: number, slot: Slot) => MonkeyHints,
+): void {
+  for (const [i, p] of snapshot.players.entries()) {
     if (p.slot === scene.localSlot) scene.ring(p.x, p.y + 30, p.r + 2, 0xffffff, 2); // at the feet, under the monkey
-    animator.draw(scene, p, snapshot.tick, scene.view);
+    animator.draw(scene, p, snapshot.tick, scene.view, hints?.(i, p.slot));
   }
 }
 
@@ -53,4 +57,9 @@ export function fallbackRenderer(snapshot: BaseSnapshot, scene: RenderScene): vo
   }
   drawPlayers(snapshot, scene);
   drawTimer(snapshot, scene);
+}
+
+/** True for a few ticks after an ability fires, judged from its ready-at tick and cooldown. */
+export function justActed(readyAt: number | undefined, tick: number, cooldownSeconds = 0): boolean {
+  return readyAt !== undefined && readyAt - tick > secondsToTicks(cooldownSeconds) - 4;
 }

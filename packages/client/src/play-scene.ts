@@ -42,7 +42,7 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
       this.text(320, 250, String(Math.max(1, this.net.introCountdown())), { size: 40 });
       if (intro.round === intro.totalRounds)
         this.text(320, 290, 'Final round: double points!', { size: 14, color: '#ffd23f' });
-    } else if (view && miniGameId && phase !== 'LOBBY' && phase !== null) {
+    } else if (view && miniGameId && (phase === 'PLAYING' || phase === 'RESULTS')) {
       getRenderer(miniGameId)(view, this);
     }
     if (phase === 'INTRO' || phase === 'PLAYING' || phase === 'RESULTS') this.scoreboard();
