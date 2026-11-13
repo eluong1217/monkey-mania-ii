@@ -2,7 +2,7 @@
 
 - **Assignee:** Haiku
 - **Depends on:** T10, T11, T12, T13
-- **Status:** review
+- **Status:** done
 
 ## Goal
 One command that plays thousands of bot-only rounds and prints numbers to tune against.
