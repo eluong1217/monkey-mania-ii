@@ -160,5 +160,6 @@ describe('coconut-dodge bots', () => {
     const median = (lengths[49]! + lengths[50]!) / 2;
     expect(median).toBeGreaterThanOrEqual(15);
     expect(median).toBeLessThanOrEqual(40);
-  });
+    // 100 full rounds take several seconds; allow headroom when the suite runs in parallel.
+  }, 30_000);
 });

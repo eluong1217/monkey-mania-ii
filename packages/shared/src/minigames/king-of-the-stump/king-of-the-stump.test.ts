@@ -182,7 +182,6 @@ describe('king-of-the-stump bots', () => {
     }
     lengths.sort((a, b) => a - b);
     const median = (lengths[49]! + lengths[50]!) / 2;
-    if (process.env.KOTS_REPORT) process.stdout.write(`median ${median} wins ${wins}\n`);
     expect(median).toBeGreaterThanOrEqual(10);
     expect(median).toBeLessThanOrEqual(35);
     expect(Math.max(...wins)).toBeLessThan(45);
