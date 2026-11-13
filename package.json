@@ -13,6 +13,7 @@
     "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "build": "npm run build --workspaces",
+    "balance": "tsx scripts/balance.ts",
     "start": "npm run start -w @monkey-mania-2/server"
   },
   "devDependencies": {

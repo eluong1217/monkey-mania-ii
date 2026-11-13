@@ -50,7 +50,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 3+ | [T12 Mini-game: Banana Heist](T12-banana-heist.md) | Sonnet | T02, T08 | done |
 | 3+ | [T13 Mini-game: King of the Stump](T13-king-of-the-stump.md) | Sonnet | T02, T08 | done |
 | 7 | [T09 Party flow](T09-party-flow.md) | Sonnet | T07 | done |
-| 7 | [T14 Balance harness](T14-balance-harness.md) | Haiku | T10–T13 | todo |
+| 7 | [T14 Balance harness](T14-balance-harness.md) | Haiku | T10–T13 | review |
 | 8 | [P01 Playtest and tuning notes](P01-playtest.md) | You | T09, T10–T13 | todo |
 
 **Milestone M2:** a full 5-round match is playable end to end with placeholder shapes.
