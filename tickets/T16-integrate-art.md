@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T15, A02, A03, A04
-- **Status:** review
+- **Status:** done
 
 ## Goal
 Every placeholder shape is replaced by the delivered art, animated and layered correctly.
@@ -61,8 +61,8 @@ Particles, screen shake, sound (T17); HUD styling (T18).
 - Coconut Dodge: shadow targets and splats also land on the palm border outside the sand (visible top-right and left in `coconut-dodge.png`). The arena covers the whole 640x360 canvas but the backdrop's playable sand is smaller. Either the backdrop or the arena bounds need aligning (design call, not fixed here).
 - Scoreboard labels along the bottom edge are hard to read (left for T18, out of scope here).
 
-**Not met / for later**
-- T10-T13 are not built, so there are no mini-game states to wire. Mini-game renderers (`render/<id>.ts`) should call `MonkeyAnimator` with hints and draw their own entities (stashes by owner colour, platform scaling, the coconut shadow target). Coconuts and rotten fruit art exist in the manifest.
-- Per-mini-game and podium screenshots, the "no placeholder textures" check in a full match, and the 60 fps check still need doing once the games exist.
+**Review:** the owner played a full match and accepted it as is. Accepted without change: the Coconut Dodge arena vs backdrop misalignment, the hand-repaired `splat.png` (a re-export from the art owner would still be better), and the fps check, which was only measured in headless Chromium (median 60, min 41).
+
+**For later**
 - The DOM menus (`screens.ts`) still sit over a 55% dark overlay, so title and lobby art is dimmed; T18 owns that styling.
 - Podium art is the lobby backdrop; crown and badges are loaded but unused until T18.
