@@ -36,8 +36,9 @@ export const tuning = {
   scatterMin: 22,
   scatterMax: 50,
   // Stashes
-  stashRadius: 30,
-  stashMargin: 56,
+  stashRadius: 40, // matches the dirt circle of the stone platforms in the background
+  stashMarginX: 150, // platform centres in assets/backgrounds/banana-heist.png
+  stashMarginY: 82,
   stealSeconds: 1,
   // Coconut throw
   throwCooldownSeconds: 1.5,
@@ -111,12 +112,13 @@ export interface BananaHeistSnapshot extends BaseSnapshot {
 }
 
 /** Stash centres, one per corner, indexed by slot. */
-const m = tuning.stashMargin;
+const mx = tuning.stashMarginX;
+const my = tuning.stashMarginY;
 export const STASH_POSITIONS: readonly (readonly [number, number])[] = [
-  [m, m],
-  [LOGICAL_WIDTH - m, m],
-  [m, LOGICAL_HEIGHT - m],
-  [LOGICAL_WIDTH - m, LOGICAL_HEIGHT - m],
+  [mx, my],
+  [LOGICAL_WIDTH - mx, my],
+  [mx, LOGICAL_HEIGHT - my],
+  [LOGICAL_WIDTH - mx, LOGICAL_HEIGHT - my],
 ];
 
 export function stashPosition(slot: Slot): readonly [number, number] {
