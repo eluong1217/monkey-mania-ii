@@ -5,7 +5,7 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { DEFAULT_CONFIG, type ServerConfig } from './config.js';
 import { CLOSE_POLICY, Connection } from './connection.js';
 import { ipTag, jsonLog, type Log } from './log.js';
-import { startMatch } from './match.js';
+import { startMatch, type MatchOptions } from './match.js';
 import type { RoomHooks } from './room.js';
 import { RoomManager } from './rooms.js';
 
@@ -28,6 +28,8 @@ export interface AppOptions {
   /** Limits; anything left out takes its default (see config.ts). */
   config?: Partial<ServerConfig>;
   log?: Log;
+  /** Extra match options (tests use this to play short matches). */
+  match?: MatchOptions;
 }
 
 /** The client address. Behind a proxy, the last X-Forwarded-For hop is the one the proxy saw. */
@@ -69,6 +71,7 @@ export function createApp(clientDir: string, options: AppOptions = {}): App {
       onMatchStart: (room) => {
         log('matchStart', { room: room.code });
         startMatch(room, undefined, {
+          ...options.match,
           log: (event, data) => log(event, { room: room.code, ...data }),
         });
       },

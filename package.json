@@ -14,10 +14,12 @@
     "lint": "eslint . && prettier --check .",
     "build": "npm run build --workspaces",
     "balance": "tsx scripts/balance.ts",
-    "start": "npm run start -w @monkey-mania-2/server"
+    "start": "npm run start -w @monkey-mania-2/server",
+    "e2e": "npm run build && playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",
     "concurrently": "^10.0.7",
     "eslint": "^10.14.0",

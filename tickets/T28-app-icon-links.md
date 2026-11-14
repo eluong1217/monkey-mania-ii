@@ -2,7 +2,7 @@
 
 - **Assignee:** Haiku
 - **Depends on:** A07, T19
-- **Status:** todo
+- **Status:** review
 
 ## Goal
 The browser tab shows the game's favicon, and adding the game to an iPhone Home Screen gives the A07 icon with the name "Monkey Mania II".
@@ -28,3 +28,7 @@ The browser tab shows the game's favicon, and adding the game to an iPhone Home 
 A web app manifest (`manifest.webmanifest`), the 192 and 512 icons' use, an Android install prompt, a service worker, `favicon.ico`, changing `theme-color`.
 
 ## Handoff
+- **Built:** The three `<link>` tags (favicon 32, favicon 16, apple-touch-icon 180) are in `<head>` of `packages/client/index.html`. The `<title>` and `apple-mobile-web-app-title` already read exactly "Monkey Mania II: Primate Party" and "Monkey Mania II", so they were left alone. The "Icons" section in `assets/README.md` already exists (it was in the working tree before this session). Icons are not in `assets/manifest.json`; its only "icon" key is `timer_icon`. This session confirmed the existing edits and made no further code changes.
+- **Verified:** `npm test` passed on rerun (210 tests); one run before it showed a single failing test in `packages/shared` (the minigame suite, around `wins`/`totalStash`), not rerun-reproducible and not in T28's files. `npm run build` passed, and `packages/client/dist/assets/icons/` holds all five files. Dev server on :5173: `curl -I` on `/assets/icons/favicon-32.png`, `favicon-16.png` and `apple-touch-icon.png` each returned 200 with `Content-Type: image/png`. Head tags match the ticket.
+- **Not checked:** The browser tab favicon was not viewed in a browser. The iPhone Home Screen check (Share → Add to Home Screen shows "Monkey Mania II" and the A07 icon) is still to do by the owner. Device: not yet checked.
+- **For T29:** The icons are linked from `<head>`. `icon-192.png` and `icon-512.png` are unlinked, reserved for a future manifest.

@@ -98,3 +98,17 @@ Record the source and licence of every audio file in `audio/CREDITS.md`.
 ## Fonts
 
 `fonts/lilita-one.woff2` is **Lilita One** (Juan Montoreano), the bold rounded menu and HUD font. Licence: SIL Open Font Licence 1.1, full text in `fonts/OFL.txt`. Obtained from the Fontsource `@fontsource/lilita-one` 5.3.0 package (Latin subset). It is loaded by `@font-face` in `packages/client/index.html` and awaited before the game starts.
+
+## Icons
+
+`icons/` holds the red monkey app icon, generated from `_source/app_icon_master.png` (A07). All are opaque PNGs.
+
+| File | Size | Use |
+|---|---|---|
+| `apple-touch-icon.png` | 180×180 | iPhone Home Screen |
+| `favicon-32.png` | 32×32 | browser tab |
+| `favicon-16.png` | 16×16 | browser tab |
+| `icon-192.png` | 192×192 | Android, for a future web manifest (not linked yet) |
+| `icon-512.png` | 512×512 | Android, for a future web manifest (not linked yet) |
+
+The first three are linked from `<head>` in `packages/client/index.html`. They are not loaded through `manifest.json`, which only lists what the game loads by key.

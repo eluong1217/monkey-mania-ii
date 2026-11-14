@@ -2,7 +2,7 @@
 
 - **Assignee:** Gemini (Google AI Pro) + you
 - **Depends on:** A01, A02
-- **Status:** todo
+- **Status:** done
 
 ## Goal
 One icon that stands for the game on an iPhone Home Screen and in a browser tab.
@@ -55,3 +55,8 @@ Linking the icon into the page (T28). A web app manifest, a `favicon.ico`, icons
 ## Notes
 
 ## Handoff
+
+- **Built:** `assets/_source/app_icon_raw.jpeg` (2048×2048, one Gemini generation, used as is) was downscaled with `sips` to the 1024 master `assets/_source/app_icon_master.png`, then to `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`. `favicon-32.png` and `favicon-16.png` come from a tighter central 860×860 crop of the master so the face fills more of the square.
+- **Verified:** `sips -g hasAlpha` reports `no` for the master and all five icons; sizes are as listed. At 32 px, enlarged, it still reads as a monkey with a red bandana. Head and ears span about 10–89% horizontally and 18–79% vertically in the master, so nothing lies in the outer 10% except the bandana tail and the left ear tip, which touch the 10% line.
+- **Not checked:** 16 px was not inspected by eye; no image editor was used, so there was no manual cleanup (the raw had no text, border or rounded corners). One variation only, not three or four.
+- **For T28:** link `assets/icons/apple-touch-icon.png` as `apple-touch-icon` and the two favicon PNGs as `icon` with `sizes="32x32"` / `"16x16"`. `icon-192.png` and `icon-512.png` are for a future manifest.
