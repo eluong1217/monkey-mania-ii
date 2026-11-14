@@ -87,7 +87,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 12 | [T29 Add-to-Home-Screen hint](T29-home-screen-hint.md) | Sonnet | T19, T26, T28 | todo |
 | 9 | [T21 Hardening](T21-hardening.md) | Opus | T09 | done |
 | 10 | [T22 End-to-end smoke test](T22-e2e-smoke.md) | Sonnet | T20, T21 | todo |
-| 10 | [T24 README and portfolio blurb](T24-readme.md) | Haiku | T20 | todo |
+| 10 | [T24 README and portfolio blurb](T24-readme.md) | Haiku | T20 | review |
 
 **Milestone M4:** public link, friends can join from phones or laptops.
 
