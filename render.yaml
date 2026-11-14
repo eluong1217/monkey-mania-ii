@@ -8,3 +8,5 @@ services:
     envVars:
       - key: DRAIN_MS
         value: '25000' # Render waits about 30 s after SIGTERM
+      - key: TRUST_PROXY
+        value: '1' # client IP comes from Render's X-Forwarded-For, for the per-IP limit

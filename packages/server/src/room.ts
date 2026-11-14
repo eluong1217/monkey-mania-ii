@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import {
   MAX_PLAYERS,
   type ErrorCode,
@@ -8,10 +8,13 @@ import {
   type ServerMessage,
   type Slot,
 } from '@monkey-mania-2/shared';
+import { noLog, type Log } from './log.js';
 
 /** Where a room sends messages for one human. A real socket or a test double. */
 export interface Member {
   send(message: ServerMessage): void;
+  /** The room dropped this member (seat taken over, room closed): tell them and disconnect. */
+  evict?(message: string): void;
 }
 
 interface Seat {
@@ -26,12 +29,27 @@ interface Seat {
 /** The running match loop, as the room and connections see it. */
 export interface MatchHandle {
   input(slot: Slot, input: PlayerInput): void;
-  stop(): void;
+  stop(reason?: 'stopped' | 'empty'): void;
 }
 
 export type RoomResult = { ok: true } | { ok: false; code: ErrorCode; message: string };
 const OK: RoomResult = { ok: true };
 const err = (code: ErrorCode, message: string): RoomResult => ({ ok: false, code, message });
+
+/** Constant-time token check. Lengths are public (always 32 hex chars for real tokens). */
+function tokenMatches(expected: string, given: string): boolean {
+  if (!expected) return false;
+  const a = Buffer.from(expected);
+  const b = Buffer.from(given);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** Round messages a rejoining player needs to catch up; the latest of each, in send order. */
+const REPLAYED: ReadonlySet<ServerMessage['type']> = new Set([
+  'roundIntro',
+  'roundResult',
+  'matchResult',
+]);
 
 export interface RoomHooks {
   /** Called once when the host starts the match, with the room in INTRO and bots seated. */
@@ -47,10 +65,12 @@ export class Room {
   /** Set while a match loop runs for this room. */
   match: MatchHandle | null = null;
   private readonly seats: (Seat | null)[] = Array.from({ length: MAX_PLAYERS }, () => null);
+  private replay: ServerMessage[] = [];
 
   constructor(
     readonly code: string,
     private readonly hooks: RoomHooks,
+    private readonly log: Log = noLog,
   ) {}
 
   /** Seats a human in the first free slot. Returns null when the room is full. */
@@ -63,7 +83,35 @@ export class Room {
     return { slot, rejoinToken };
   }
 
-  /** Removes a human. In the lobby the seat is freed; later phases keep it, marked disconnected (T21). */
+  /**
+   * Gives a human seat back to whoever holds its rejoin token. The seat keeps its name and
+   * score; a socket still holding it (a stale tab, or a drop the heartbeat has not noticed yet)
+   * is returned as `replaced` so the caller can evict it. Null when no seat has that token.
+   */
+  rejoin(
+    token: string,
+    member: Member,
+  ): { slot: Slot; rejoinToken: string; replaced: Member | null } | null {
+    let found = -1;
+    // Check every seat so the time taken does not depend on which one matched.
+    this.seats.forEach((s, i) => {
+      if (s && !s.isBot && tokenMatches(s.rejoinToken, token)) found = i;
+    });
+    const seat = this.seats[found];
+    if (!seat) return null;
+    const replaced = seat.member;
+    seat.member = member;
+    seat.connected = true;
+    if (!this.seats[this.host]?.connected) this.setHost(found);
+    return { slot: found, rejoinToken: seat.rejoinToken, replaced };
+  }
+
+  /** Sends a rejoined player the current round's intro and latest results, in order. */
+  catchUp(slot: Slot): void {
+    for (const m of this.replay) this.sendTo(slot, m);
+  }
+
+  /** Removes a human. In the lobby the seat is freed; later phases keep it, marked disconnected. */
   leave(slot: Slot): void {
     const seat = this.seats[slot];
     if (!seat || seat.isBot) return;
@@ -75,9 +123,26 @@ export class Room {
     }
     if (this.host === slot) {
       const next = this.humanSlots().find((s) => this.seats[s]?.connected);
-      if (next !== undefined) this.host = next;
+      if (next !== undefined) this.setHost(next);
     }
     this.broadcastState();
+  }
+
+  /** Disconnects every member (the room is closing). */
+  evictAll(message: string): void {
+    for (const seat of this.seats) {
+      const member = seat?.member;
+      if (!seat || !member) continue;
+      seat.member = null;
+      seat.connected = false;
+      member.evict?.(message);
+    }
+  }
+
+  private setHost(slot: Slot): void {
+    if (this.host === slot) return;
+    this.host = slot;
+    this.log('hostChanged', { room: this.code, host: slot });
   }
 
   setReady(slot: Slot, ready: boolean): RoomResult {
@@ -125,13 +190,14 @@ export class Room {
     if (!this.seats[slot]) return err('badPhase', 'Not seated.');
     if (this.phase !== 'PODIUM') return err('badPhase', 'Rematch is only available on the podium.');
     this.phase = 'LOBBY';
+    this.replay = [];
     for (let i = 0; i < MAX_PLAYERS; i++) {
       const seat = this.seats[i];
       if (!seat) continue;
       if (seat.isBot || !seat.connected) this.seats[i] = null;
       else seat.ready = false;
     }
-    if (!this.seats[this.host]) this.host = this.humanSlots()[0] ?? 0;
+    if (!this.seats[this.host]) this.setHost(this.humanSlots()[0] ?? 0);
     this.broadcastState();
     return OK;
   }
@@ -167,6 +233,11 @@ export class Room {
   }
 
   broadcast(message: ServerMessage): void {
+    if (REPLAYED.has(message.type)) {
+      if (message.type === 'roundIntro' && message.round === 1) this.replay = [];
+      this.replay = this.replay.filter((m) => m.type !== message.type);
+      this.replay.push(message);
+    }
     for (const seat of this.seats) seat?.member?.send(message);
   }
 

@@ -9,6 +9,7 @@ import {
   listMiniGameIds,
 } from '@monkey-mania-2/shared';
 import { loadSaved, save, type Connection } from './connection';
+import { Reconnector } from './reconnect';
 import { ASSET_BASE, monkeyColor } from './assets/manifest';
 
 type RoomState = Extract<ServerMessage, { type: 'roomState' }>;
@@ -49,7 +50,9 @@ function el<K extends keyof HTMLElementTagNameMap>(
 /** Plain DOM menus over the game canvas: Home, Lobby, and a disconnected state. */
 export class Screens {
   private slot: Slot | null = null;
+  private rejoinToken = '';
   private room: RoomState | null = null;
+  private readonly reconnect: Reconnector;
   private error = '';
   private roundResult: RoundResult | null = null;
   private matchResult: MatchResult | null = null;
@@ -69,8 +72,15 @@ export class Screens {
       if (e.key === 'Escape' && !this.room && this.view !== 'start') this.go('start');
       else this.root.classList.add('skip');
     });
+    // Registered first, so its 'error' handler sees whether we were rejoining.
+    this.reconnect = new Reconnector(
+      conn,
+      () => this.rejoinMessage(),
+      () => this.render(),
+    );
     this.conn.on('joined', (m) => {
       this.slot = m.slot;
+      this.rejoinToken = m.rejoinToken;
       save('rejoinToken', m.rejoinToken);
       this.error = '';
     });
@@ -102,6 +112,21 @@ export class Screens {
     this.render();
   }
 
+  /** What to send after a dropped connection to get our seat back; null when not in a room. */
+  private rejoinMessage(): ClientMessage | null {
+    const room = this.room;
+    if (!room) return null;
+    const seatName = this.slot === null ? '' : (room.seats[this.slot]?.name ?? '');
+    const rejoinToken = this.rejoinToken || loadSaved('rejoinToken');
+    return {
+      type: 'joinRoom',
+      v: PROTOCOL_VERSION,
+      code: room.code,
+      name: loadSaved('name') || seatName || 'Monkey',
+      ...(rejoinToken ? { rejoinToken } : {}),
+    };
+  }
+
   private connectAndSend(message: ClientMessage): void {
     this.error = '';
     if (this.conn.status === 'open') {
@@ -123,8 +148,10 @@ export class Screens {
 
   private leave(): void {
     this.conn.send({ type: 'leave' });
-    this.conn.close();
     this.room = null;
+    this.reconnect.stop();
+    this.reconnect.failed = false;
+    this.conn.close();
     this.slot = null;
     this.error = '';
     this.view = 'start';
@@ -151,8 +178,10 @@ export class Screens {
     }
     this.root.replaceChildren(
       this.room
-        ? this.conn.status === 'closed'
-          ? this.disconnected()
+        ? this.conn.status !== 'open' || this.reconnect.active || this.reconnect.failed
+          ? this.reconnect.active
+            ? this.reconnecting()
+            : this.disconnected()
           : this.room.phase === 'RESULTS'
             ? this.results(this.room)
             : this.room.phase === 'PODIUM'
@@ -457,6 +486,18 @@ export class Screens {
     );
   }
 
+  private reconnecting(): HTMLElement {
+    const leave = el('button', { type: 'button', textContent: 'Leave' });
+    leave.onclick = () => this.leave();
+    return el(
+      'main',
+      { className: 'screen' },
+      el('h1', { textContent: 'Reconnecting…' }),
+      el('p', { textContent: 'A bot is playing for you until you are back.' }),
+      leave,
+    );
+  }
+
   private disconnected(): HTMLElement {
     const retry = el('button', { type: 'button', textContent: 'Back to menu' });
     retry.onclick = () => this.leave();
@@ -465,7 +506,7 @@ export class Screens {
       'main',
       { className: 'screen' },
       el('h1', { textContent: 'Disconnected' }),
-      el('p', { textContent: 'Lost connection to the server.' }),
+      el('p', { textContent: this.error || 'Lost connection to the server.' }),
       retry,
     );
   }

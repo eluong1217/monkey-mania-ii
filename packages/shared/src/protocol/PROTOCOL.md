@@ -32,3 +32,9 @@ Slots are seats `0..3`. Room codes are 4 letters from `ABCDEFGHJKMNPQRSTUVWXYZ`.
 ## Room phases
 
 `LOBBY → INTRO → PLAYING → RESULTS → (INTRO …) → PODIUM → LOBBY` (via `rematch`).
+
+## Reconnecting
+
+A player who drops after the match starts keeps their seat: a bot plays it and their score is kept by slot. Sending `joinRoom` with the saved `rejoinToken` restores the seat (same slot, name and score) as long as the room exists; the reply is `joined` (same token), `roomState`, then the latest `roundResult`/`roundIntro`/`matchResult` so the client can catch up. A token that matches no seat is refused with `badPhase` once the match has started; in the lobby it is ignored and the player joins as a newcomer. Rejoining while an old socket still holds the seat moves the seat to the new socket.
+
+The server closes sockets with code `4000` when it drops a member on purpose (seat taken by another window, idle room closed; an `error` explains why first): clients must not reconnect after it. `1008` means a limit was hit (flooding, too many sockets from one address); `1009` a frame was too large. The server pings every 15 s and drops sockets that do not answer.

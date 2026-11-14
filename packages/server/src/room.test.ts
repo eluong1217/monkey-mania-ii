@@ -17,8 +17,8 @@ class FakeSocket {
 
 const started = vi.fn();
 let mgr: RoomManager;
-function setup(emptyTimeoutMs = 1000) {
-  mgr = new RoomManager({ hooks: { onMatchStart: started }, emptyTimeoutMs });
+function setup(emptyRoomMs = 1000) {
+  mgr = new RoomManager({ hooks: { onMatchStart: started }, config: { emptyRoomMs } });
 }
 function client() {
   const socket = new FakeSocket();

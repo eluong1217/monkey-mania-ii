@@ -45,7 +45,7 @@ export function withSimNetwork(inner: SocketLike, opts: SimNetworkOptions): Sock
     close: () => inner.close(),
   };
   inner.onopen = () => outer.onopen?.();
-  inner.onclose = () => outer.onclose?.();
+  inner.onclose = (ev) => outer.onclose?.(ev);
   inner.onerror = () => outer.onerror?.();
   inner.onmessage = (ev) => {
     if (opts.drop > 0 && isSnapshot(ev.data) && random() < opts.drop) return;

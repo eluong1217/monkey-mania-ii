@@ -54,7 +54,6 @@ export interface MatchRoom {
   seatInfo(): (SeatInfo | null)[];
   broadcast(message: ServerMessage): void;
   broadcastState(): void;
-  isEmpty(): boolean;
 }
 
 export type MatchLog = (event: string, data: Record<string, unknown>) => void;
@@ -198,8 +197,9 @@ export class Match implements MatchHandle {
     this.inputs.set(slot, input, this.tick);
   }
 
-  stop(): void {
-    this.end('stopped');
+  /** Ends the loop. The room manager passes 'empty' when the last human's grace period ran out. */
+  stop(reason: 'stopped' | 'empty' = 'stopped'): void {
+    this.end(reason);
   }
 
   private end(reason: 'finished' | 'empty' | 'error' | 'stopped'): void {
@@ -219,7 +219,6 @@ export class Match implements MatchHandle {
 
   private readonly onTick = (): void => {
     try {
-      if (this.room.isEmpty()) return this.end('empty');
       this.phaseTicks++;
       switch (this.room.phase) {
         case 'INTRO':
@@ -252,19 +251,26 @@ export class Match implements MatchHandle {
     }
   };
 
-  /** Anyone who left mid-match is replaced by a bot on the next tick. */
-  private replaceLeavers(): void {
+  /**
+   * A human who left mid-match is played by a bot from the next tick; one who rejoins takes the
+   * seat back. Scores are kept by slot, so neither changes them.
+   */
+  private syncSeats(): void {
     for (const seat of this.room.seatInfo()) {
-      if (seat && !seat.isBot && !seat.connected && !this.bots.has(seat.slot)) {
+      if (!seat || seat.isBot) continue;
+      if (!seat.connected && !this.bots.has(seat.slot)) {
         this.addBot(seat.slot);
         this.log('botReplaced', { slot: seat.slot, round: this.party.round });
+      } else if (seat.connected && this.bots.has(seat.slot)) {
+        this.bots.delete(seat.slot);
+        this.log('humanRestored', { slot: seat.slot, round: this.party.round });
       }
     }
   }
 
   private play(): void {
     const g = this.miniGame;
-    this.replaceLeavers();
+    this.syncSeats();
     const inputs: PlayerInput[] = [];
     for (const slot of this.slots) {
       const bot = this.bots.get(slot);

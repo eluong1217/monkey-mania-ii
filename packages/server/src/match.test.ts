@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createBotFor,
   DIFFICULTIES,
@@ -55,10 +55,13 @@ class FakeClock implements Clock {
 
 class FakeSocket {
   sent: ServerMessage[] = [];
+  closedWith: number | undefined;
   send(d: string) {
     this.sent.push(JSON.parse(d) as ServerMessage);
   }
-  close() {}
+  close(code?: number) {
+    this.closedWith = code;
+  }
 }
 
 const constant = (input: PlayerInput) => (): PlayerInput => ({ ...input });
@@ -80,7 +83,6 @@ function fakeRoom() {
     seatInfo: () => BOT_SEATS,
     broadcast: (m) => sent.push(m),
     broadcastState: () => {},
-    isEmpty: () => false,
   };
   return room;
 }
@@ -165,31 +167,31 @@ describe('match loop', () => {
     mgr.close();
   });
 
-  it('a flooding, garbage-sending client cannot affect anyone else or stall the loop', () => {
+  it('garbage, spoofed and replayed messages cannot affect anyone or stall the loop', () => {
     const seed = 42;
-    const run = (flood: boolean) => {
+    const garbage: unknown[] = [
+      'not json {',
+      null,
+      'x'.repeat(5000),
+      { type: 'input', tick: -1, input: { moveX: -1 } },
+      { type: 'input', tick: 0, input: { moveX: -1, moveY: 1, action: true } }, // replayed tick
+      { type: 'input', tick: 1e12, slot: 0, input: 'left' }, // future-dated, bogus slot
+      { type: 'setReady', ready: true },
+      { type: 'startMatch' },
+      { type: 'rematch' },
+    ];
+    const run = (noisy: boolean) => {
       const { clock, room, a, b, mgr, match } = humanRoom(seed);
       let ticks = 0;
       while (room.phase !== 'PODIUM' && ticks < 1000) {
         a.send({ type: 'input', tick: ticks, input: INPUT_A });
-        b.send({ type: 'input', tick: ticks, input: INPUT_B });
-        if (flood) {
-          // Through the connection: a spoofed slot that sanitises to INPUT_B gets past the
-          // rate limiter (2 messages per tick); the flood after it is dropped there.
-          b.send({ type: 'input', tick: 1, slot: 0, input: { moveX: 1e9, moveY: 'up' } });
-          for (let i = 0; i < 50; i++) {
-            b.conn.receive('not json {');
-            b.conn.receive(null);
-            b.conn.receive('x'.repeat(5000));
-            b.send({ type: 'input', tick: -1, input: { moveX: -1 } });
-            b.send({ type: 'input', tick: 1, input: 'left' });
-            // These sanitise to INPUT_B: clamped, non-numbers zeroed, a bogus slot ignored.
-            b.send({ type: 'input', tick: 1, slot: 0, input: { moveX: 1e9, moveY: 'up' } });
-            b.send({ type: 'input', tick: 1, input: { moveX: 5, action: 'yes' } });
-            b.send({ type: 'setReady', ready: true });
-            b.send({ type: 'startMatch' });
-          }
-          // Straight into the match, past the rate limiter: everything is sanitised and the
+        if (noisy) {
+          // A bogus slot is ignored and the input sanitises to INPUT_B.
+          b.send({ type: 'input', tick: ticks, slot: 0, input: { moveX: 1e9, moveY: 'up' } });
+          const g = garbage[ticks % garbage.length];
+          if (typeof g === 'object' && g !== null) b.send(g);
+          else b.conn.receive(g);
+          // Straight into the match, past the connection: everything is sanitised and the
           // latest input wins (the last one sanitises to INPUT_B).
           const m = match();
           const raw = (x: unknown) => m.input(1, x as PlayerInput);
@@ -198,6 +200,8 @@ describe('match loop', () => {
           raw(null);
           raw({ moveX: NaN, moveY: Infinity, action: 1 });
           raw({ moveX: 5, action: 'yes' });
+        } else {
+          b.send({ type: 'input', tick: ticks, input: INPUT_B });
         }
         clock.advance(PERIOD);
         ticks++;
@@ -213,13 +217,32 @@ describe('match loop', () => {
     expect(noisy.last).toEqual(calm.last);
   });
 
-  it('stops and cleans up when every human leaves mid-round', () => {
+  it('a flooding client is closed, its seat goes to a bot, and the loop keeps time', () => {
+    const { clock, room, a, b, mgr } = humanRoom(42);
+    let ticks = 0;
+    while (room.phase !== 'PODIUM' && ticks < 1000) {
+      a.send({ type: 'input', tick: ticks, input: INPUT_A });
+      for (let i = 0; i < 50; i++) b.send({ type: 'input', tick: ticks * 50 + i, input: INPUT_B });
+      clock.advance(PERIOD);
+      ticks++;
+    }
+    expect(b.socket.closedWith).toBe(1008);
+    // A flood is not answered with a flood: a handful of errors for thousands of messages.
+    expect(b.socket.sent.filter((m) => m.type === 'error').length).toBeLessThan(5);
+    expect(room.seatInfo()[1]).toMatchObject({ isBot: false, connected: false });
+    expect(snapshots(a.socket.sent)).toHaveLength(200);
+    mgr.close();
+  });
+
+  it('stops and cleans up once the last human has been gone for the grace period', () => {
+    vi.useFakeTimers();
     let ended = '';
     const clock = new FakeClock();
     const mgr = new RoomManager({
       hooks: {
         onMatchStart: (room) => startMatch(room, 'sandbox', { clock, onEnd: (r) => (ended = r) }),
       },
+      config: { emptyRoomMs: 1000 },
     });
     const socket = new FakeSocket();
     const conn = new Connection(socket, mgr, () => clock.now());
@@ -232,12 +255,17 @@ describe('match loop', () => {
     )!;
     expect(room.phase).toBe('PLAYING');
     conn.disconnect();
-    clock.advance(PERIOD * 2);
+    // Bots play on while the player has time to come back.
+    clock.advance(PERIOD * 30);
+    expect(ended).toBe('');
+    vi.advanceTimersByTime(1001);
     expect(ended).toBe('empty');
     expect(room.match).toBeNull();
+    expect(mgr.get(room.code)).toBeUndefined();
     // The match left nothing scheduled on its clock.
     expect(clock.timers).toHaveLength(0);
     mgr.close();
+    vi.useRealTimers();
   });
 
   it("one room's exception does not affect another room", () => {

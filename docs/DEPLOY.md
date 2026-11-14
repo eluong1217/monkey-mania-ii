@@ -17,6 +17,9 @@ One process serves the client, `/healthz` and the `/ws` WebSocket on `PORT` (Ren
 - **Health check:** Render polls `/healthz`.
 - **Deploys and graceful shutdown:** on SIGTERM the server refuses new rooms (clients see "Server is restarting") and waits for running matches, up to `DRAIN_MS` (25 s in `render.yaml`, under Render's shutdown window). Longer matches are cut off.
 - **Caching:** hashed bundles (`assets/index-<hash>.js`) are cached for a year; `index.html` is `no-cache`; unhashed game art is cached for an hour.
+- **Limits** (defaults in `packages/server/src/config.ts`; set an env var to override): `MAX_ROOMS` 200, `MAX_CONNECTIONS_PER_IP` 8, `MAX_MESSAGE_BYTES` 4096, `MESSAGES_PER_SECOND` 60 / `MESSAGE_BURST` 90, `IDLE_LOBBY_MS` 900000 (15 min), `EMPTY_ROOM_MS` 30000 (how long a room with nobody connected waits for a rejoin), `HEARTBEAT_MS` 15000.
+- **`TRUST_PROXY=1`** (set in `render.yaml`) reads the client IP from the last `X-Forwarded-For` hop. Leave it unset anywhere the server is reached directly, or clients could spoof it. If Cloudflare's proxy (orange cloud) is turned on, that hop becomes a Cloudflare address and the per-IP limit then counts per Cloudflare edge.
+- **Logs** are one JSON line per event (`roomCreated`, `playerJoined`, `playerRejoined`, `hostChanged`, `matchEnd`, `roomRemoved`, `connectionRefused`, `matchError`, ...). IPs never appear; a salted per-process hash (`ip`) groups lines from one client.
 - **Single instance:** rooms are not shared between instances, so never scale beyond one.
 
 ## Roll back

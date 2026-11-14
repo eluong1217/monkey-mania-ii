@@ -10,7 +10,7 @@ export interface SocketLike {
   send(data: string): void;
   close(): void;
   onopen: (() => void) | null;
-  onclose: (() => void) | null;
+  onclose: ((ev?: { code?: number }) => void) | null;
   onerror: (() => void) | null;
   onmessage: ((ev: { data: unknown }) => void) | null;
 }
@@ -22,9 +22,14 @@ type Events = ServerEvents & { status: ConnectionStatus; badMessage: string };
 
 type Handler<K extends keyof Events> = (payload: Events[K]) => void;
 
+/** Server close code meaning "do not reconnect": the seat was taken over or the room closed. */
+export const CLOSE_EVICTED = 4000;
+
 /** Typed wrapper around a WebSocket: parses server messages and emits them by `type`. */
 export class Connection {
   status: ConnectionStatus = 'idle';
+  /** Close code of the last socket the server (or network) closed; null after our own close(). */
+  closeCode: number | null = null;
   private socket: SocketLike | null = null;
   private handlers: { [K in keyof Events]?: Handler<K>[] } = {};
 
@@ -42,6 +47,7 @@ export class Connection {
   /** Open the socket. Resolves true once open, false if it closes or errors first. */
   connect(): Promise<boolean> {
     this.close();
+    this.closeCode = null;
     this.setStatus('connecting');
     const socket = this.createSocket();
     this.socket = socket;
@@ -50,9 +56,12 @@ export class Connection {
         this.setStatus('open');
         resolve(true);
       };
-      socket.onclose = socket.onerror = () => {
+      // Browsers always follow an error with a close, which carries the code; wait for it.
+      socket.onerror = () => {};
+      socket.onclose = (ev?: { code?: number }) => {
         if (this.socket !== socket) return;
         this.socket = null;
+        this.closeCode = ev?.code ?? null;
         this.setStatus('closed');
         resolve(false);
       };
@@ -78,6 +87,7 @@ export class Connection {
     const socket = this.socket;
     if (!socket) return;
     this.socket = null;
+    this.closeCode = null;
     socket.onopen = socket.onclose = socket.onerror = socket.onmessage = null;
     socket.close();
     this.setStatus('closed');

@@ -42,6 +42,8 @@ conn.on('roomState', () => {
   keyboard.capturing = net.inRound;
   if (!net.inRound) fit(); // catch up on any resize held back during the round
 });
+// A dropped connection hands the keys back to the menus (the Reconnecting screen).
+conn.on('status', () => (keyboard.capturing = net.inRound));
 
 /** Text on the canvas is rendered once, so the menu font must be ready before the first frame. */
 const fontReady = document.fonts

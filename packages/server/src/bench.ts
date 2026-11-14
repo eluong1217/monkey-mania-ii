@@ -29,7 +29,6 @@ const done = new Promise<void>((resolve) => {
         bytes += encodeMessage(m).length * MAX_PLAYERS;
       },
       broadcastState: () => {},
-      isEmpty: () => false,
     };
     matches.push(
       startMatch(room, 'sandbox', {

@@ -22,7 +22,3 @@ export class RateLimiter {
     return true;
   }
 }
-
-/** Inputs arrive at ~30/s, so this leaves plenty of headroom for honest clients. */
-export const MESSAGE_BURST = 90;
-export const MESSAGES_PER_SECOND = 60;
