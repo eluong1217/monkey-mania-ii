@@ -70,6 +70,8 @@ export class Connection implements Member {
         if (this.room) return this.error('badPhase', 'Already in a room.');
         let room: Room | undefined;
         if (m.type === 'createRoom') {
+          if (this.rooms.draining)
+            return this.error('badPhase', 'Server is restarting. Try again in a minute.');
           room = this.rooms.create();
         } else {
           room = this.rooms.get(m.code);

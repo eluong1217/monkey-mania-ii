@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: monkey-mania-2
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: DRAIN_MS
+        value: '25000' # Render waits about 30 s after SIGTERM

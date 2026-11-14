@@ -49,3 +49,15 @@ it('four real clients reach all-ready and start the match', async () => {
   await others[0]!.until((m) => m.type === 'roomState' && m.phase === 'INTRO');
   clients.forEach((c) => c.ws.close());
 });
+
+it('refuses new rooms while draining', async () => {
+  const app = createApp('/nonexistent');
+  server = app;
+  await new Promise<void>((r) => app.listen(0, '127.0.0.1', r));
+  app.drain();
+  const c = open((app.address() as AddressInfo).port);
+  await c.ready;
+  c.send({ type: 'createRoom', v: PROTOCOL_VERSION, name: 'Late' });
+  await c.until((m) => m.type === 'error');
+  c.ws.close();
+});

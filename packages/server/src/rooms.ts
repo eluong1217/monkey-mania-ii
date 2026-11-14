@@ -24,8 +24,18 @@ export class RoomManager {
     this.random = options.random ?? Math.random;
   }
 
+  /** True once shutdown has begun: no new rooms, existing ones play on. */
+  draining = false;
+
   get size(): number {
     return this.rooms.size;
+  }
+
+  /** Rooms whose match loop is still running. */
+  activeMatches(): number {
+    let n = 0;
+    for (const room of this.rooms.values()) if (room.match) n++;
+    return n;
   }
 
   create(): Room {
