@@ -83,7 +83,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 8 | [T20 Deploy](T20-deploy.md) | Sonnet | T09 | done |
 | 8 | [T23 CI](T23-ci.md) | Haiku | T01 | done |
 | 10 | [T19 Touch controls and scaling](T19-touch-responsive.md) | Sonnet | T09, T27 | done |
-| 11 | [T28 Wire the app icon into the page](T28-app-icon-links.md) | Haiku | A07, T19 | review |
+| 11 | [T28 Wire the app icon into the page](T28-app-icon-links.md) | Haiku | A07, T19 | done |
 | 12 | [T29 Add-to-Home-Screen hint](T29-home-screen-hint.md) | Sonnet | T19, T26, T28 | todo |
 | 9 | [T21 Hardening](T21-hardening.md) | Opus | T09 | done |
 | 10 | [T22 End-to-end smoke test](T22-e2e-smoke.md) | Sonnet | T20, T21 | todo |
