@@ -2,7 +2,7 @@
 
 - **Assignee:** Haiku
 - **Depends on:** T01
-- **Status:** review
+- **Status:** done
 
 ## Goal
 Every push and pull request is checked automatically.
