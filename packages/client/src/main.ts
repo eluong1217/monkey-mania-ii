@@ -49,7 +49,9 @@ function fit(): void {
     Math.floor(Math.min(innerWidth / LOGICAL_SIZE.width, innerHeight / LOGICAL_SIZE.height)),
   );
   game?.scale.setZoom(zoom);
+  document.documentElement.style.setProperty('--zoom', String(zoom));
 }
+fit();
 addEventListener('resize', fit);
 
 const ui = document.getElementById('ui');

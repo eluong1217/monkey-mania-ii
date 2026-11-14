@@ -1,4 +1,4 @@
-# Monkey Mania II: Monkey Party — Design Contract
+# Monkey Mania II: Primate Party — Design Contract
 
 Every ticket assumes this document. If a ticket and this document disagree, this document wins; change it only through an Opus ticket or by the owner.
 
@@ -6,6 +6,7 @@ Every ticket assumes this document. If a ticket and this document disagree, this
 
 A 4-player online party game in the browser. Empty seats are filled by bots. A match is a set of short mini-games; whoever has the most party points at the end wins.
 
+- **Start menu:** full-screen title "Monkey Mania II:" with "Primate Party" beneath it, then Play, How to Play, Settings. Play leads to create/join room.
 - **Match:** 5 rounds, each a random mini-game with no repeats until the pool is exhausted.
 - **Round flow:** intro card with controls (3 s) → play (30–60 s) → results (4 s).
 - **Party points per round:** 1st 3, 2nd 2, 3rd 1, 4th 0. Ties share the higher value. The final round is worth double.
@@ -40,7 +41,7 @@ Rules that every ticket follows:
 2. **One simulation.** All gameplay logic lives in `packages/shared` and is deterministic: fixed 30 Hz tick, seeded RNG, no `Math.random`, no wall-clock time. The same code runs on the server, in tests and in the balance harness.
 3. **Mini-games are plug-ins.** Each implements the `MiniGame` interface from T02 in its own folder: `packages/shared/src/minigames/<id>/`. Adding one must not require editing another.
 4. **Bots are players.** A bot is a function from visible state to a `PlayerInput`, run on the server. Bots get no information or abilities a human lacks.
-5. **Logical resolution 640×360**, integer-scaled with nearest-neighbour filtering (no smoothing). The low resolution is part of the early-2000s console look.
+5. **Logical resolution 640×360**, integer-scaled with nearest-neighbour filtering (no smoothing). The low resolution is part of the early-2000s console look. Menus are laid out for the same screen and scale with it. Spare window space around the canvas shows the arcade cabinet frame (see Art direction); the frame never reduces the scale.
 6. **Snapshots** go out at 20 Hz as JSON. Optimise only after measuring.
 7. **Simplest thing that works.** No accounts, database, matchmaking, chat or cosmetics in v1. No dependency without a clear reason.
 8. **Never trust the client.** Validate and rate-limit every inbound message; sanitise names.
@@ -67,6 +68,8 @@ Early-2000s sixth-generation console look, delivered as pre-rendered 2D sprites 
 Character animation uses few frames; movement life comes from code (bobbing, tilting, squash and stretch).
 
 Four monkeys distinguished by colour AND an accessory (bandana, cap, shades, flower) so nothing relies on colour alone. Avoid heavy flashing; provide a reduced-effects toggle. An optional CRT screen filter may be added as a setting, off by default; it is never baked into assets.
+
+The game is presented on an arcade machine: an early-2000s four-player cabinet in a dim arcade fills the window around the canvas, with a marquee above the screen and a control panel with four joysticks in the seat colours below it. The frame is page decoration behind the canvas, not part of the 640×360 picture; it is muted so the game stays the brightest thing in view, and the window crops it.
 
 ### Style block
 

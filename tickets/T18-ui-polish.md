@@ -1,7 +1,7 @@
 # T18 — HUD and UI polish
 
 - **Assignee:** Sonnet
-- **Depends on:** T09, T15
+- **Depends on:** T09, T15, T26
 - **Status:** done
 
 ## Goal
@@ -9,7 +9,7 @@ Menus and HUD look like a finished early-2000s console party game and stay reada
 
 ## Scope (`packages/client`)
 - A bold, rounded early-2000s console menu font (openly licensed; record the licence in `assets/README.md`) across all screens. It must stay legible at the 640×360 logical resolution.
-- Restyle Home, Lobby, intro card, results card, podium and settings using the UI art from A03/A04.
+- Restyle the Start menu (T26), Home, Lobby, intro card, results card, podium and settings using the UI art from A03/A04.
 - In-round HUD: timer, per-player score or alive/out status, cooldown indicator for your action, and a clear "this is you" marker on your monkey.
 - Scoreboard between rounds animates point gains.
 - Screen transitions are short fades or wipes.

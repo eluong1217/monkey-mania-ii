@@ -12,7 +12,7 @@ One background per mini-game plus title and lobby art. This is where image gener
 - `coconut-dodge`: top-down sandy beach clearing ringed by palms; the centre must be plain so shadows read clearly.
 - `banana-heist`: top-down jungle floor with four distinct corners and an open middle.
 - `king-of-the-stump`: top-down view into a misty canopy or river far below; the stump from A03 sits on top.
-- Title screen: a lush jungle scene with space for the logo.
+- Title screen: a lush jungle scene, used behind the start menu (T26). Keep the upper-middle calm for the title and the lower-middle calm for the menu. No lettering in the image; the game draws the title as text.
 - Lobby: a calm treehouse or campfire scene with room for four seat panels.
 
 ## Prompt template
@@ -20,7 +20,7 @@ One background per mini-game plus title and lobby art. This is where image gener
 >
 > [style block from docs/DESIGN.md]
 
-For the logo, generate the scene without text and add the "Monkey Mania II" lettering yourself in the menu font from T18; generated lettering is rarely clean.
+Generate the title scene without text; generated lettering is rarely clean, and the start menu (T26) draws "Monkey Mania II:" and "Primate Party" as real text in the game font.
 
 ## Done when
 - Six images in `assets/backgrounds/`, named per the manifest.

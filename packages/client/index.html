@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monkey Mania II</title>
+    <title>Monkey Mania II: Primate Party</title>
     <style>
       @font-face {
         font-family: 'Lilita One';
@@ -23,12 +23,33 @@
         overflow: hidden;
       }
       #game {
+        position: relative;
+        z-index: 1;
         width: 100%;
         height: 100%;
       }
+      /* Decorative cabinet: 1280x720 times the zoom, so its central quarter sits under the canvas. */
+      #frame {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: calc(1280px * var(--zoom, 1));
+        height: calc(720px * var(--zoom, 1));
+        transform: translate(-50%, -50%);
+        max-width: none;
+        pointer-events: none;
+        user-select: none;
+      }
+      /* The menus live on a fixed 1280x720 screen, scaled by zoom / 2 and clipped to the canvas. */
       #ui {
         position: fixed;
-        inset: 0;
+        z-index: 2;
+        left: 50%;
+        top: 50%;
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+        transform: translate(-50%, -50%) scale(calc(var(--zoom, 1) / 2));
         display: grid;
         place-items: center;
         font:
@@ -40,7 +61,7 @@
         background: rgba(10, 20, 10, 0.55);
       }
       .screen {
-        width: min(520px, 92vw);
+        width: 520px;
         box-sizing: border-box;
         padding: 36px 40px;
         border: 40px solid transparent;
@@ -127,6 +148,91 @@
         outline-offset: 2px;
         box-shadow: 0 0 0 7px #e8590c;
       }
+      #ui.title {
+        background: #000;
+      }
+      /* Fills the 1280x720 menu screen (the zoom comes from #ui's scale). */
+      .start {
+        --z: 2;
+        width: 1280px;
+        height: 720px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: calc(11px * var(--z));
+        background:
+          url('/assets/backgrounds/title.png') center / cover,
+          linear-gradient(#2fae62, #145a35);
+      }
+      .logo {
+        margin: 0;
+        font-weight: normal;
+        font-size: calc(40px * var(--z));
+        color: var(--gold);
+        text-shadow:
+          0 5px 0 #5a3b00,
+          0 0 12px #000;
+        animation: drop 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+      }
+      .tagline {
+        margin: 0 0 calc(12px * var(--z));
+        font-size: calc(22px * var(--z));
+        color: #ff9f43;
+        text-shadow: 0 3px 0 #000;
+        animation: fade-slow 0.6s 0.8s ease-out both;
+      }
+      .menu {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        animation: fade-slow 0.4s 1.2s ease-out both;
+      }
+      .menu button {
+        min-width: calc(110px * var(--z));
+        font-size: calc(11px * var(--z));
+      }
+      .menu button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .menu button:focus-visible {
+        animation: pulse 1s ease-in-out infinite;
+      }
+      .howto {
+        padding-left: 20px;
+        font-size: 18px;
+      }
+      #ui.skip .logo,
+      #ui.skip .tagline,
+      #ui.skip .menu {
+        animation: none;
+      }
+      @keyframes drop {
+        from {
+          transform: translateY(-800px);
+        }
+      }
+      @keyframes fade-slow {
+        from {
+          opacity: 0;
+        }
+      }
+      @keyframes pulse {
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .logo,
+        .tagline,
+        .menu,
+        .menu button:focus-visible {
+          animation: none;
+        }
+      }
       .seats {
         list-style: none;
         padding: 0;
@@ -189,7 +295,12 @@
       }
       #fade {
         position: fixed;
-        inset: 0;
+        z-index: 3;
+        left: 50%;
+        top: 50%;
+        width: calc(640px * var(--zoom, 1));
+        height: calc(360px * var(--zoom, 1));
+        transform: translate(-50%, -50%);
         background: #000;
         opacity: 0;
         pointer-events: none;
@@ -203,6 +314,7 @@
         top: 8px;
         left: 8px;
         margin: 0;
+        z-index: 5;
         padding: 6px 8px;
         font: 12px/1.3 monospace;
         color: #0f0;
@@ -212,6 +324,7 @@
     </style>
   </head>
   <body>
+    <img id="frame" src="/assets/ui/arcade_frame.jpg" alt="" aria-hidden="true" draggable="false" />
     <div id="game"></div>
     <div id="ui"></div>
     <div id="fade"></div>

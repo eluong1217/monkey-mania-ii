@@ -5,6 +5,8 @@ import {
   type ClientMessage,
   type ServerMessage,
   type Slot,
+  getMiniGame,
+  listMiniGameIds,
 } from '@monkey-mania-2/shared';
 import { loadSaved, save, type Connection } from './connection';
 import { ASSET_BASE, monkeyColor } from './assets/manifest';
@@ -52,6 +54,8 @@ export class Screens {
   private roundResult: RoundResult | null = null;
   private matchResult: MatchResult | null = null;
   private readonly inviteCode: string;
+  /** Which pre-room screen is up. An invite link skips the start menu. */
+  private view: 'start' | 'howto' | 'home' = 'start';
 
   constructor(
     private readonly root: HTMLElement,
@@ -60,6 +64,11 @@ export class Screens {
     this.inviteCode = (new URLSearchParams(location.search).get('room') ?? '')
       .toUpperCase()
       .slice(0, ROOM_CODE_LENGTH);
+    if (this.inviteCode) this.view = 'home';
+    addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !this.room && this.view !== 'start') this.go('start');
+      else this.root.classList.add('skip');
+    });
     this.conn.on('joined', (m) => {
       this.slot = m.slot;
       save('rejoinToken', m.rejoinToken);
@@ -118,7 +127,14 @@ export class Screens {
     this.room = null;
     this.slot = null;
     this.error = '';
+    this.view = 'start';
     history.replaceState(null, '', '/');
+    this.render();
+  }
+
+  private go(view: 'start' | 'howto' | 'home'): void {
+    this.view = view;
+    this.error = '';
     this.render();
   }
 
@@ -142,14 +158,70 @@ export class Screens {
             : this.room.phase === 'PODIUM'
               ? this.podium(this.room)
               : this.lobby(this.room)
-        : this.home(),
+        : this.view === 'start'
+          ? this.start()
+          : this.view === 'howto'
+            ? this.howTo()
+            : this.home(),
     );
+    this.root.classList.toggle('title', !this.room && this.view === 'start');
     const focus = this.root.querySelector<HTMLElement>('[autofocus]');
     focus?.focus();
   }
 
   private errorLine(): HTMLElement {
     return el('p', { className: 'error', textContent: this.error, role: 'alert' });
+  }
+
+  private start(): HTMLElement {
+    const item = (text: string, onClick?: () => void): HTMLButtonElement => {
+      const b = el('button', { type: 'button', textContent: text });
+      if (onClick) b.onclick = onClick;
+      else b.disabled = true; // Settings arrives with T17.
+      return b;
+    };
+    const buttons = [
+      item('Play', () => this.go('home')),
+      item('How to Play', () => this.go('howto')),
+      item('Settings'),
+    ];
+    buttons[0]?.setAttribute('autofocus', '');
+    const menu = el('nav', { className: 'menu' }, ...buttons);
+    menu.onkeydown = (e) => {
+      const enabled = buttons.filter((b) => !b.disabled);
+      const i = enabled.indexOf(document.activeElement as HTMLButtonElement);
+      const step = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      enabled[(i + step + enabled.length) % enabled.length]?.focus();
+    };
+    return el(
+      'main',
+      { className: 'start' },
+      el('h1', { className: 'logo', textContent: 'Monkey Mania II:' }),
+      el('p', { className: 'tagline', textContent: 'Primate Party' }),
+      menu,
+    );
+  }
+
+  private howTo(): HTMLElement {
+    const back = el('button', { type: 'button', textContent: 'Back' });
+    back.onclick = () => this.go('start');
+    back.setAttribute('autofocus', '');
+    const games = listMiniGameIds()
+      .filter((id) => id !== 'sandbox')
+      .map((id) => getMiniGame(id))
+      .map((g) =>
+        g ? el('li', {}, el('b', { textContent: `${g.displayName}: ` }), g.controlsHint) : '',
+      );
+    return el(
+      'main',
+      { className: 'screen' },
+      el('h1', { textContent: 'How to Play' }),
+      el('p', { textContent: 'Move: WASD or arrow keys (touch stick). Action: Space (tap).' }),
+      el('ul', { className: 'howto' }, ...games),
+      el('div', { className: 'row' }, back),
+    );
   }
 
   private home(): HTMLElement {
@@ -172,6 +244,8 @@ export class Screens {
       if (v) save('name', v);
       return v;
     };
+    const back = el('button', { type: 'button', textContent: 'Back' });
+    back.onclick = () => this.go('start');
     const create = el('button', { type: 'button', textContent: 'Create Room' });
     const join = el('button', { type: 'button', textContent: 'Join Room' });
     create.onclick = () => {
@@ -204,7 +278,7 @@ export class Screens {
         textContent: this.inviteCode ? `Joining room ${this.inviteCode}` : 'Room code',
       }),
       code,
-      el('div', { className: 'row' }, join),
+      el('div', { className: 'row' }, join, back),
       this.errorLine(),
     );
     form.onsubmit = (e) => {
