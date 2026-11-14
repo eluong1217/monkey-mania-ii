@@ -38,7 +38,7 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | 4 | [T06 Client shell and lobby screens](T06-client-shell.md) | Sonnet | T03 | done |
 | 5 | [T05 Authoritative match loop](T05-match-loop.md) | Opus | T04, T08 | done |
 | 6 | [T07 Client netcode and rendering](T07-client-netcode.md) | Opus | T05, T06 | done |
-| 5 | [T26 Start menu](T26-start-menu.md) | Sonnet | T06 | review |
+| 5 | [T26 Start menu](T26-start-menu.md) | Sonnet | T06 | done |
 
 **Milestone M1:** four seats (any mix of browsers and bots) join a room by link and move around a sandbox arena.
 
@@ -66,12 +66,13 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 | any | [A04 Backgrounds and title art](A04-backgrounds.md) | Gemini + you | A01 | done |
 | any | [A05 Sound effects and music](A05-audio.md) | You | — | todo |
 | any | [A06 Arcade cabinet frame art](A06-arcade-frame.md) | Gemini + you | A01 | done |
+| any | [A07 App icon and favicon](A07-app-icon.md) | Gemini + you | A01, A02 | todo |
 | 7 | [T15 Asset manifest and loader](T15-asset-loader.md) | Sonnet | T07 | done |
 | 9 | [T16 Integrate final art](T16-integrate-art.md) | Sonnet | T15, A02–A04 | done |
 | 9 | [T17 Juice and audio](T17-juice-audio.md) | Sonnet | T15, A05, T09 | todo |
 | 9 | [T18 HUD and UI polish](T18-ui-polish.md) | Sonnet | T09, T15, T26 | done |
 | 9 | [T25 Mini-game action animation](T25-action-animation-hints.md) | Sonnet | T16, T10–T13 | done |
-| 9 | [T27 Arcade cabinet frame around the screen](T27-arcade-frame.md) | Sonnet | A06, T18 | review |
+| 9 | [T27 Arcade cabinet frame around the screen](T27-arcade-frame.md) | Sonnet | A06, T18 | done |
 
 **Milestone M3:** the game looks and sounds finished.
 
@@ -81,7 +82,9 @@ Work top to bottom. Tickets in the same wave have no dependency on each other an
 |---|---|---|---|---|
 | 8 | [T20 Deploy](T20-deploy.md) | Sonnet | T09 | todo |
 | 8 | [T23 CI](T23-ci.md) | Haiku | T01 | todo |
-| 10 | [T19 Touch controls and scaling](T19-touch-responsive.md) | Sonnet | T09, T27 | todo |
+| 10 | [T19 Touch controls and scaling](T19-touch-responsive.md) | Sonnet | T09, T27 | done |
+| 11 | [T28 Wire the app icon into the page](T28-app-icon-links.md) | Haiku | A07, T19 | todo |
+| 12 | [T29 Add-to-Home-Screen hint](T29-home-screen-hint.md) | Sonnet | T19, T26, T28 | todo |
 | 9 | [T21 Hardening](T21-hardening.md) | Opus | T09 | todo |
 | 10 | [T22 End-to-end smoke test](T22-e2e-smoke.md) | Sonnet | T20, T21 | todo |
 | 10 | [T24 README and portfolio blurb](T24-readme.md) | Haiku | T20 | todo |

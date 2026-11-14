@@ -106,7 +106,11 @@ export class NetGame {
   }
 
   private tick(): void {
-    const input = this.sampleInput();
+    this.advance(this.sampleInput());
+  }
+
+  /** Send one input and step the prediction with it, so tick numbers and history stay in step. */
+  private advance(input: PlayerInput): void {
     if (this.slot !== null && this.inRound) {
       this.conn.send({ type: 'input', tick: this.localTick, input });
     }
@@ -115,6 +119,11 @@ export class NetGame {
     const me = this.buffer.newest?.players.find((p) => p.slot === this.slot);
     if (this.phase === 'PLAYING' && speed !== undefined && me)
       this.predictor.step(input, speed, me.r);
+  }
+
+  /** Tell the server to stop moving us now (the tab is hidden, so no more ticks will run). */
+  sendNeutral(): void {
+    this.advance({ ...NEUTRAL_INPUT });
   }
 
   /** Run due client ticks and return what to draw now (null before the first snapshot). */

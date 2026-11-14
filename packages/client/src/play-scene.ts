@@ -1,11 +1,17 @@
 import Phaser from 'phaser';
 import { getMiniGame, secondsToTicks, type BaseSnapshot } from '@monkey-mania-2/shared';
 import { monkeyColor, monkeyKey } from './assets/manifest';
+import { isTouchDevice } from './touch';
 import type { NetGame } from './net/net-game';
 import { getRenderer, type RenderScene, type SpriteOpts } from './render';
 
 /** The smallest text drawn on the canvas, in logical pixels. */
 const MIN_TEXT_PX = 8;
+
+/** Control hints name the on-screen controls on phones and the keys elsewhere. */
+const TOUCH = isTouchDevice();
+const MOVE_HINT = TOUCH ? 'LEFT THUMB STICK' : 'WASD / ARROWS';
+const ACTION_HINT = TOUCH ? 'GO! BUTTON' : 'SPACE';
 
 /** Draws the current round each frame through the renderer registry. */
 export class PlayScene extends Phaser.Scene implements RenderScene {
@@ -73,11 +79,11 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
     // Right: move keys and the action key.
     g.fillStyle(0x000000, 0.45).fillRoundedRect(420, 140, 160, 150, 14);
     this.text(500, 156, 'MOVE', { size: 11, color: '#ffd23f' });
-    this.text(500, 176, 'WASD / ARROWS', { size: 11 });
+    this.text(500, 176, MOVE_HINT, { size: 11 });
     this.text(500, 206, 'ACTION', { size: 11, color: '#ffd23f' });
     g.fillStyle(0xfff6dc).fillRoundedRect(450, 220, 100, 26, 6);
     g.lineStyle(3, 0x5a3b00).strokeRoundedRect(450, 220, 100, 26, 6);
-    this.text(500, 233, 'SPACE', { size: 14, color: '#2b1a00', stroke: false });
+    this.text(500, 233, ACTION_HINT, { size: TOUCH ? 11 : 14, color: '#2b1a00', stroke: false });
     this.text(500, 264, action.toUpperCase(), { size: 14 });
     if (intro.round === intro.totalRounds)
       this.text(320, 312, 'Final round: double points!', { size: 14, color: '#ffd23f' });
@@ -136,7 +142,7 @@ export class PlayScene extends Phaser.Scene implements RenderScene {
       size: 12,
       color: left ? '#c9cdd2' : '#ffd23f',
     });
-    this.text(cx + 60, cy + 8, 'SPACE', { size: 9 });
+    this.text(cx + 60, cy + 8, ACTION_HINT, { size: 9 });
   }
 
   /** Compact party scores along the bottom edge, always visible during a round. */

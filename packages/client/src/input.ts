@@ -23,7 +23,12 @@ export class Keyboard {
       this.down.delete(e.code);
     });
     // Keys released while the window is unfocused would otherwise stay held.
-    target.addEventListener('blur', () => this.down.clear());
+    target.addEventListener('blur', () => this.release());
+  }
+
+  /** Forget every held key. */
+  release(): void {
+    this.down.clear();
   }
 
   private any(codes: string[]): boolean {

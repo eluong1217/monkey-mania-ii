@@ -2,7 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"
+    />
+    <!-- Opened from the Home Screen the game runs with no browser bars (iPhone has no fullscreen API). -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Monkey Mania II" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="theme-color" content="#000000" />
     <title>Monkey Mania II: Primate Party</title>
     <style>
       @font-face {
@@ -21,6 +30,17 @@
         height: 100%;
         background: #000;
         overflow: hidden;
+        /* The game owns every gesture: no scrolling, pinch, double-tap zoom or text selection. */
+        touch-action: none;
+        overscroll-behavior: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      input {
+        -webkit-user-select: text;
+        user-select: text;
       }
       #game {
         position: relative;
@@ -309,6 +329,119 @@
       #fade.on {
         opacity: 1;
       }
+      /* Touch controls: a floating stick on the left half, one big button on the right. */
+      #touch {
+        position: fixed;
+        inset: 0;
+        z-index: 4;
+        pointer-events: none;
+      }
+      .touch-zone {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        pointer-events: auto;
+      }
+      .touch-base {
+        position: absolute;
+        width: 96px;
+        height: 96px;
+        margin: -48px 0 0 -48px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 246, 220, 0.7);
+        background: rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+      }
+      .touch-knob {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        border-radius: 50%;
+        background: rgba(255, 210, 63, 0.85);
+        border: 3px solid #5a3b00;
+      }
+      .touch-action {
+        position: absolute;
+        right: max(24px, calc(env(safe-area-inset-right) + 12px));
+        bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+        width: 100px;
+        height: 100px;
+        margin: 0;
+        padding: 0;
+        border: 4px solid #5a3b00;
+        border-image: none;
+        border-radius: 50%;
+        font:
+          28px 'Lilita One',
+          system-ui,
+          sans-serif;
+        color: var(--ink);
+        text-shadow: none;
+        background: rgba(255, 210, 63, 0.75);
+        pointer-events: auto;
+        touch-action: none;
+      }
+      .touch-action:hover,
+      .touch-action:focus-visible {
+        transform: none;
+        border-image: none;
+      }
+      .touch-action.held {
+        background: #ffd23f;
+        transform: scale(0.93);
+      }
+      /* Menus are scaled by zoom / 2, so a 44 CSS px target is 88 / zoom menu pixels. */
+      @media (pointer: coarse) {
+        button:not(.touch-action),
+        .screen input {
+          min-height: max(52px, calc(88px / var(--zoom, 1)));
+          min-width: calc(88px / var(--zoom, 1));
+        }
+      }
+      #rotate {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 24px;
+        text-align: center;
+        font:
+          24px/1.3 'Lilita One',
+          system-ui,
+          sans-serif;
+        color: var(--gold);
+        background: #0b2a18;
+      }
+      #rotate .phone {
+        font-size: 64px;
+        animation: tilt 2s ease-in-out infinite;
+      }
+      @keyframes tilt {
+        50% {
+          transform: rotate(-90deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #rotate .phone {
+          animation: none;
+          transform: rotate(-90deg);
+        }
+      }
+      /* Phones need landscape; the prompt covers everything while held upright. */
+      @media (pointer: coarse) and (orientation: portrait) and (max-width: 700px) {
+        #rotate {
+          display: flex;
+        }
+      }
       #debug {
         position: fixed;
         top: 8px;
@@ -328,6 +461,10 @@
     <div id="game"></div>
     <div id="ui"></div>
     <div id="fade"></div>
+    <div id="rotate" role="alert">
+      <div class="phone" aria-hidden="true">&#x1F4F1;</div>
+      <div>Rotate your device to play</div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
