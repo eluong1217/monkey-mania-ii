@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T09
-- **Status:** review
+- **Status:** done
 - **Needs from owner:** which host to use and an account on it.
 
 ## Goal
@@ -37,3 +37,4 @@ Multiple regions, horizontal scaling, a database, custom domain.
 
 **Next tickets:** T22 can target `PORT`; T24 should link `docs/DEPLOY.md` and the public URL once it exists.
 
+**Owner verification (2026-11-14):** the owner deployed to Render and played a match on the public URL.
