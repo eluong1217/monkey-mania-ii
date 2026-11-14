@@ -17,7 +17,7 @@ COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/server/package.json packages/server/
 COPY packages/client/package.json packages/client/
-RUN npm ci --omit=dev --workspace=@monkey-mania-2/server --include-workspace-root=false \
+RUN npm ci --omit=dev --workspace=@monkey-mania-2/server --workspace=@monkey-mania-2/shared \
  && npm cache clean --force
 COPY --from=build /app/packages/shared/dist packages/shared/dist
 COPY --from=build /app/packages/server/dist packages/server/dist
