@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** A06, T18
-- **Status:** review
+- **Status:** done
 
 ## Goal
 The spare window space around the integer-scaled canvas shows an arcade cabinet, and the whole game, menus included, appears on its screen.

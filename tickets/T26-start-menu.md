@@ -2,7 +2,7 @@
 
 - **Assignee:** Sonnet
 - **Depends on:** T06
-- **Status:** review
+- **Status:** done
 
 ## Goal
 The first thing a player sees is a full-screen title: "Monkey Mania II:" with "Primate Party" beneath it.
